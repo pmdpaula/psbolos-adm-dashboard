@@ -61,7 +61,7 @@ _Clausula 5ª_: A data somente será reservada mediante pagamento de sinal.
 
 _Clausula 6ª_: O valor total deverá estar quitado até 7 dias antes da data do evento sob pena de perder a reserva da data.
 
-_Clausula final_: Se por efeito de força maior, o bolo não puder ser feito pela Patricia Siqueira, será feito a devolução total do valor com adicional de 10% de multa do valor pago até então.
+_Clausula final_: Se por efeito de força maior, o bolo não puder ser feito pela Patricia Siqueira, será feito a devolução total do valor.
 
 <div style="display:flex; justify-content:space-between; margin-top:1rem;">
   <div style="text-align:left;">

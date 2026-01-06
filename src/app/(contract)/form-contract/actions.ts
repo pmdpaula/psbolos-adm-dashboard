@@ -574,7 +574,7 @@ export const generatePdfAsModel = async (formData: FormData) => {
 
   // Clausula final
   yPosition = addMultilineText({
-    text: "Clausula final: Se por efeito de força maior, o bolo não puder ser feito pela Patricia Siqueira, será feito a devolução total do valor  com adicional de 10% de multa do valor pago até então.",
+    text: "Clausula final: Se por efeito de força maior, o bolo não puder ser feito pela Patricia Siqueira, será feito a devolução total do valor.",
     x: margin,
     y: yPosition,
     fontSize: 12,
