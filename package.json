@@ -10,6 +10,7 @@
     "lint:fix": "eslint src/**/*.{js,ts,tsx} --fix"
   },
   "dependencies": {
+    "@base-ui-components/react": "1.0.0-rc.0",
     "@casl/ability": "^6.7.3",
     "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
@@ -26,11 +27,11 @@
     "jspdf": "^3.0.3",
     "jspdf-autotable": "^5.0.2",
     "ky": "^1.13.0",
-    "next": "15.5.6",
+    "next": "15.5.9",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "react-hook-form": "^7.66.0",
-    "zod": "^4.1.12"
+    "react-hook-form": "^7.68.0",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
