@@ -2,7 +2,9 @@ import { z } from "zod";
 
 import { customerContactTypeType } from "@/lib/customer-contact-type";
 
-export const createCustomerDtoSchema = z.object({
+export const customerDtoSchema = z.object({
+  id: z.cuid2().optional(),
+
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres.").max(100),
 
   registerNumber: z
@@ -49,34 +51,6 @@ export const createCustomerDtoSchema = z.object({
     .nullable()
     .or(z.literal("")), // Permite string vazia como valor válido
   country: z.string().max(100).nullable().or(z.literal("")),
-});
-// .superRefine((data, ctx) => {
-//   // Validação condicional: se contactType1 for fornecido, contact1 deve ser obrigatório
-//   if (data.contactType1 && !data.contact1) {
-//     ctx.addIssue({
-//       code: z.ZodIssueCode.custom,
-//       message:
-//         "O contato 1 é obrigatório quando o tipo de contato 1 é selecionado.",
-//       path: ["contact1"],
-//     });
-//   }
-
-//   // Validação condicional: se contactType2 for fornecido, contact2 deve ser obrigatório
-//   if (data.contactType2 && !data.contact2) {
-//     ctx.addIssue({
-//       code: z.ZodIssueCode.custom,
-//       message:
-//         "O contato 2 é obrigatório quando o tipo de contato 2 é selecionado.",
-//       path: ["contact2"],
-//     });
-//   }
-// });
-
-export type CreateCustomerDto = z.infer<typeof createCustomerDtoSchema>;
-
-export const customerDtoSchema = z.object({
-  id: z.cuid2(),
-  ...createCustomerDtoSchema.shape,
 });
 
 export type CustomerDto = z.infer<typeof customerDtoSchema>;

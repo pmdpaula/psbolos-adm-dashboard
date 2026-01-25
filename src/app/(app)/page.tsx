@@ -1,36 +1,64 @@
-import { Stack, Typography } from "@mui/material";
+"use client";
+
+import { Stack, Typography, useTheme } from "@mui/material";
 import Link from "next/link";
 
-import { NeonCard } from "@/components/NeonCard";
+import GlassCardHover from "@/components/glass/GlassCardHover";
 
 const HomePage = () => {
+  const theme = useTheme();
+
   return (
-    <Stack
-      spacing={6}
-      // alignItems="center"
-    >
+    <Stack spacing={2}>
       <Link href="/form-contract">
-        <NeonCard>
+        <GlassCardHover
+          color={theme.palette.primary.main}
+          sx={{
+            textAlign: "center",
+          }}
+        >
           <Typography
             variant="h5"
             color="pink"
-            sx={{ textTransform: "uppercase", fontWeight: "bold" }}
+            sx={{ fontWeight: "bold" }}
           >
             Formulário de contrato
           </Typography>
-        </NeonCard>
+        </GlassCardHover>
       </Link>
 
       <Link href="/customer">
-        <NeonCard>
+        <GlassCardHover
+          color={theme.palette.primary.main}
+          sx={{
+            textAlign: "center",
+          }}
+        >
           <Typography
             variant="h5"
             color="pink"
-            sx={{ textTransform: "uppercase", fontWeight: "bold" }}
+            sx={{ fontWeight: "bold" }}
           >
             Clientes
           </Typography>
-        </NeonCard>
+        </GlassCardHover>
+      </Link>
+
+      <Link href="/projects">
+        <GlassCardHover
+          color={theme.palette.primary.main}
+          sx={{
+            textAlign: "center",
+          }}
+        >
+          <Typography
+            variant="h5"
+            color="pink"
+            sx={{ fontWeight: "bold" }}
+          >
+            Projetos
+          </Typography>
+        </GlassCardHover>
       </Link>
     </Stack>
   );

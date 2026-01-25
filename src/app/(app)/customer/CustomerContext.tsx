@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from "react";
 
-import type { CreateCustomerDto, CustomerDto } from "@/data/dto/customer-dto";
+import type { CustomerDto } from "@/data/dto/customer-dto";
 import type { AlertType } from "@/lib/alert";
 
 import type { OpenFormProps } from "./page";
@@ -8,10 +8,8 @@ import type { OpenFormProps } from "./page";
 export type CustomerContextType = {
   openForm: OpenFormProps;
   setOpenForm: React.Dispatch<React.SetStateAction<OpenFormProps>>;
-  customerContext: CreateCustomerDto | CustomerDto;
-  setCustomerContext: React.Dispatch<
-    React.SetStateAction<CreateCustomerDto | CustomerDto>
-  >;
+  customerContext: CustomerDto;
+  setCustomerContext: React.Dispatch<React.SetStateAction<CustomerDto>>;
   openAlertSnackBar: AlertType;
   setOpenAlertSnackBar: (alert: AlertType) => void;
 };
@@ -30,9 +28,9 @@ export const CustomerProvider = ({ children }: CustomerProviderProps) => {
     action: "none",
   });
 
-  const [customerContext, setCustomerContext] = useState<
-    CreateCustomerDto | CustomerDto
-  >({} as CreateCustomerDto | CustomerDto);
+  const [customerContext, setCustomerContext] = useState<CustomerDto>(
+    {} as CustomerDto,
+  );
 
   const [openAlertSnackBar, setOpenAlertSnackBar] = useState<AlertType>({
     isOpen: false,

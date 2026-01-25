@@ -42,7 +42,7 @@ export const Header = ({ variant = "common", title = "" }: HeaderProps) => {
           sx={{
             padding: isBreakpointSm ? 2 : 1,
             backdropFilter: "blur(10px)",
-            backgroundColor: "rgba(176, 109, 149, 0.2)",
+            backgroundColor: theme.palette.background.paper,
           }}
         >
           <Stack
@@ -59,16 +59,7 @@ export const Header = ({ variant = "common", title = "" }: HeaderProps) => {
               {title}
             </Typography>
 
-            {variant === "contract" && (
-              // <Stack
-              //   direction="row"
-              //   alignItems="center"
-              //   justifyContent="end"
-              //   spacing={0.5}
-              // >
-              <OptionsMenu />
-              // </Stack>
-            )}
+            {variant === "contract" && <OptionsMenu />}
 
             <AccountMenu />
           </Stack>

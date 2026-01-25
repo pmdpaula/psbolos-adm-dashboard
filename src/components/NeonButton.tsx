@@ -1,10 +1,10 @@
 "use client";
 
-import { Button, styled } from "@mui/material";
+import { Button, type ButtonProps, styled } from "@mui/material";
 
-interface NeonButtonProps {
-  children?: React.ReactNode;
-}
+// interface NeonButtonProps extends ButtonProps {
+//   // children?: React.ReactNode;
+// }
 
 const StyledButton = styled(Button)({
   position: "relative",
@@ -38,6 +38,13 @@ const StyledButton = styled(Button)({
   },
 });
 
-export const NeonButton = ({ children }: NeonButtonProps) => {
-  return <StyledButton variant="outlined">{children}</StyledButton>;
+export const NeonButton = ({ children, ...props }: ButtonProps) => {
+  return (
+    <StyledButton
+      variant="outlined"
+      {...props}
+    >
+      {children}
+    </StyledButton>
+  );
 };

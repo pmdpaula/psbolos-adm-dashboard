@@ -16,7 +16,7 @@ import {
 import { ptBR } from "@mui/x-data-grid/locales";
 import { useEffect, useState } from "react";
 
-import type { CreateCustomerDto, CustomerDto } from "@/data/dto/customer-dto";
+import type { CustomerDto } from "@/data/dto/customer-dto";
 import { getCustomers } from "@/http/customer/get-customers";
 
 import { FullScreenDialog } from "../../../components/FullScreenDialog";
@@ -221,7 +221,7 @@ export const CustomerDataTable = () => {
   ];
 
   function handleCallForm(action: ActionFormProps, row: GridRowModel) {
-    let customerData: CreateCustomerDto | CustomerDto;
+    let customerData: CustomerDto | CustomerDto;
 
     if (action === "edit" || action === "delete") {
       customerData = {
@@ -239,7 +239,7 @@ export const CustomerDataTable = () => {
         country: row.country,
       };
     } else {
-      customerData = row as CreateCustomerDto;
+      customerData = row as CustomerDto;
     }
 
     setOpenForm({ open: true, action });
@@ -284,7 +284,7 @@ export const CustomerDataTable = () => {
 
           <Tooltip title="Adicionar Cliente">
             <Button
-              onClick={() => handleCallForm("create", {} as CreateCustomerDto)}
+              onClick={() => handleCallForm("create", {} as CustomerDto)}
               variant="text"
             >
               <PersonAddTwoToneIcon />

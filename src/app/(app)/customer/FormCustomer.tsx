@@ -9,21 +9,19 @@ import {
   CircularProgress,
   FormControl,
   FormHelperText,
-  type FormHelperTextProps,
-  Input,
   InputLabel,
   MenuItem,
-  OutlinedInput,
   Select,
   type SelectChangeEvent,
   Stack,
-  styled,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
-import type { CustomerDto } from "@/data/dto/customer-dto";
-import { customerDtoSchema } from "@/data/dto/customer-dto";
+import { StyledFormHelperText } from "@/components/form-fields/StyledFormHelperText";
+import { StyledInput } from "@/components/form-fields/StyledInput";
+import { StyledOutlinedInput } from "@/components/form-fields/StyledOutlinedInput";
+import { type CustomerDto, customerDtoSchema } from "@/data/dto/customer-dto";
 import {
   customerContactTypeDescription,
   customerContactTypeType,
@@ -32,26 +30,17 @@ import {
 import { deleteCustomerAction, editCustomerAction } from "./action";
 import { useCustomerContext } from "./CustomerContext";
 
-export const StyledFormHelperText = styled(FormHelperText)<FormHelperTextProps>(
-  {
-    display: "flex",
-    textAlign: "end",
-    alignSelf: "end",
-    height: 6,
-  },
-);
+// export const StyledOutlinedInput = styled(OutlinedInput, {
+//   shouldForwardProp: (prop) => prop !== "error",
+// })<{ error?: boolean }>(({ error }) => ({
+//   boxShadow: error ? "0px 0px 12px 2px rgba(255,0,0,0.5)" : "",
+// }));
 
-export const StyledOutlinedInput = styled(OutlinedInput, {
-  shouldForwardProp: (prop) => prop !== "error",
-})<{ error?: boolean }>(({ error }) => ({
-  boxShadow: error ? "0px 0px 12px 2px rgba(255,0,0,0.5)" : "",
-}));
-
-export const StyledInput = styled(Input, {
-  shouldForwardProp: (prop) => prop !== "error",
-})<{ error?: boolean }>(({ error }) => ({
-  boxShadow: error ? "0px 0px 12px 2px rgba(255,0,0,0.5)" : "",
-}));
+// export const StyledInput = styled(Input, {
+//   shouldForwardProp: (prop) => prop !== "error",
+// })<{ error?: boolean }>(({ error }) => ({
+//   boxShadow: error ? "0px 0px 12px 2px rgba(255,0,0,0.5)" : "",
+// }));
 
 export const FormCustomer = () => {
   const { openForm, setOpenForm, setOpenAlertSnackBar, customerContext } =
@@ -138,7 +127,7 @@ export const FormCustomer = () => {
     if (action === "edit") {
       submitResponse = await editCustomerAction(data);
     } else {
-      submitResponse = await deleteCustomerAction(data.id);
+      submitResponse = await deleteCustomerAction(data.id!);
     }
 
     if (submitResponse.success) {
@@ -337,7 +326,7 @@ export const FormCustomer = () => {
                       size="small"
                       id="contact1"
                       {...field}
-                      value={field.value}
+                      value={field.value || ""}
                       disabled={action === "delete"}
                     />
                   ) : (
@@ -431,7 +420,7 @@ export const FormCustomer = () => {
                       size="small"
                       id="contact2"
                       {...field}
-                      value={field.value}
+                      value={field.value || ""}
                       disabled={action === "delete"}
                     />
                   ) : (
@@ -441,7 +430,7 @@ export const FormCustomer = () => {
                       label="CPF/CNPJ"
                       {...field}
                       value={field.value || ""}
-                      error={errors.registerNumber ? true : false}
+                      error={errors.contact2 ? true : false}
                     />
                   )}
 
@@ -519,7 +508,7 @@ export const FormCustomer = () => {
                       size="small"
                       id="zipCode"
                       {...field}
-                      value={field.value}
+                      value={field.value || ""}
                       disabled={action === "delete"}
                     />
                   ) : (
@@ -561,7 +550,7 @@ export const FormCustomer = () => {
                       size="small"
                       id="city"
                       {...field}
-                      value={field.value}
+                      value={field.value || ""}
                       disabled={action === "delete"}
                     />
                   ) : (

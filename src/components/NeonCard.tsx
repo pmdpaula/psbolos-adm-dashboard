@@ -2,9 +2,9 @@
 
 import { Box, type BoxProps, styled } from "@mui/material";
 
-interface NeonCardProps extends React.HTMLAttributes<BoxProps> {
-  children?: React.ReactNode;
-}
+// interface NeonCardProps extends React.HTMLAttributes<BoxProps> {
+//   children?: React.ReactNode;
+// }
 
 const StyledBox = styled(Box)({
   position: "relative",
@@ -63,6 +63,6 @@ const StyledBox = styled(Box)({
   },
 });
 
-export const NeonCard = ({ children }: NeonCardProps) => {
-  return <StyledBox>{children}</StyledBox>;
+export const NeonCard = ({ children, ...props }: BoxProps) => {
+  return <StyledBox {...props}>{children}</StyledBox>;
 };

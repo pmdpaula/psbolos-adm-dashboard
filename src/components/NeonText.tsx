@@ -1,20 +1,23 @@
 "use client";
 
-import { styled } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
 import Typography, { TypographyProps } from "@mui/material/Typography";
 
-interface NeonTextProps extends TypographyProps {
-  children: React.ReactNode;
-}
+export const NeonText = ({ children, ...props }: TypographyProps) => {
+  const theme = useTheme();
 
-const StyledText = styled(Typography)<TypographyProps>(({ theme }) => ({
-  textShadow: `0 0 9px ${theme.palette.primary.main}, 0 0 10px ${theme.palette.primary.main}, 0 0 15px ${theme.palette.primary.main}`,
-  // color: "transparent",
-  WebkitBackgroundClip: "text",
-  backgroundClip: "text",
-  backgroundImage: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-}));
-
-export const NeonText = ({ children, ...props }: NeonTextProps) => {
-  return <StyledText {...props}>{children}</StyledText>;
+  return (
+    <Typography
+      {...props}
+      sx={{
+        ...props.sx,
+        textShadow: `0 0 9px ${theme.palette.primary.main}, 0 0 10px ${theme.palette.primary.main}, 0 0 15px ${theme.palette.primary.main}`,
+        WebkitBackgroundClip: "text",
+        backgroundClip: "text",
+        backgroundImage: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+      }}
+    >
+      {children}
+    </Typography>
+  );
 };

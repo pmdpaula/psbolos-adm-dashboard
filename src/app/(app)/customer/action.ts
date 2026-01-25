@@ -2,12 +2,12 @@
 
 import { HTTPError } from "ky";
 
-import type { CreateCustomerDto, CustomerDto } from "@/data/dto/customer-dto";
+import type { CustomerDto } from "@/data/dto/customer-dto";
 import { createCustomer } from "@/http/customer/create-customer";
-import { deleteCustomer } from "@/http/customer/delete-user";
+import { deleteCustomer } from "@/http/customer/delete-customer";
 import { editCustomer } from "@/http/customer/edit-customer";
 
-export async function createCustomerAction(data: CreateCustomerDto) {
+export async function createCustomerAction(data: CustomerDto) {
   const {
     name,
     registerNumber,

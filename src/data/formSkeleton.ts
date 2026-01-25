@@ -14,27 +14,32 @@ type FormSkeleton = {
   fields: FieldType[];
 }[];
 
-export const BatterOptions = ["branca (genoise)", "red velvet", "chocolate", "laranja"];
+export const BatterOptions = [
+  "branca (genoise)",
+  "red velvet",
+  "chocolate",
+  "laranja",
+];
 
 export const FillingOptions = [
   "brigadeiro branco",
-"brigadeiro de cream cheese",
-"brigadeiro de limão siciliano",
-"brigadeiro de pistache",
-"brigadeiro de baunilha",
-"brigadeiro ao leite",
-"brigadeiro de amarena",
-"brigadeiro de nozes",
-"cocada fresca",
-"caramelo salgado",
-"creme de maracujá",
-"doce de leite",
-"geléia de abacaxi",
-"geléia de morango",
-"geléia de ameixa",
-"geléia de damasco",
-"geléia de frutas amarelas",
-"ganache meio amargo"
+  "brigadeiro de cream cheese",
+  "brigadeiro de limão siciliano",
+  "brigadeiro de pistache",
+  "brigadeiro de baunilha",
+  "brigadeiro ao leite",
+  "brigadeiro de amarena",
+  "brigadeiro de nozes",
+  "cocada fresca",
+  "caramelo salgado",
+  "creme de maracujá",
+  "doce de leite",
+  "geléia de abacaxi",
+  "geléia de morango",
+  "geléia de ameixa",
+  "geléia de damasco",
+  "geléia de frutas amarelas",
+  "ganache meio amargo",
 ];
 
 export const formSkeleton: FormSkeleton = [
@@ -80,9 +85,27 @@ export const formSkeleton: FormSkeleton = [
         disabled: false,
         required: true,
       },
-      { name: "recheio1", label: "Recheio 1", type: "selection", disabled: false, required: true },
-      { name: "recheio2", label: "Recheio 2", type: "selection", disabled: false, required: true },
-      { name: "recheio3", label: "Recheio 3", type: "selection", disabled: false, required: true },
+      {
+        name: "recheio1",
+        label: "Recheio 1",
+        type: "selection",
+        disabled: false,
+        required: true,
+      },
+      {
+        name: "recheio2",
+        label: "Recheio 2",
+        type: "selection",
+        disabled: false,
+        required: true,
+      },
+      {
+        name: "recheio3",
+        label: "Recheio 3",
+        type: "selection",
+        disabled: false,
+        required: true,
+      },
       {
         name: "observacoesBolo",
         label: "Observações do Bolo",

@@ -17,8 +17,9 @@ import {
 import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
-import type { CreateCustomerDto } from "@/data/dto/customer-dto";
-import { createCustomerDtoSchema } from "@/data/dto/customer-dto";
+import { StyledFormHelperText } from "@/components/form-fields/StyledFormHelperText";
+import { StyledOutlinedInput } from "@/components/form-fields/StyledOutlinedInput";
+import { type CustomerDto, customerDtoSchema } from "@/data/dto/customer-dto";
 import {
   customerContactTypeDescription,
   customerContactTypeType,
@@ -26,7 +27,6 @@ import {
 
 import { createCustomerAction } from "./action";
 import { useCustomerContext } from "./CustomerContext";
-import { StyledFormHelperText, StyledOutlinedInput } from "./FormCustomer";
 
 export const FormCreateCustomer = () => {
   const { openForm, setOpenForm, setOpenAlertSnackBar } = useCustomerContext();
@@ -38,7 +38,7 @@ export const FormCreateCustomer = () => {
     watch,
     setValue,
     formState: { errors, isLoading, isValid, isDirty },
-  } = useForm<CreateCustomerDto>({
+  } = useForm<CustomerDto>({
     defaultValues: {
       name: "",
       registerNumber: null,
@@ -47,12 +47,12 @@ export const FormCreateCustomer = () => {
       contact2: null,
       contactType2: null,
       address: null,
-      city: null,
-      state: null,
+      city: "Rio de Janeiro",
+      state: "RJ",
       zipCode: null,
-      country: null,
+      country: "Brasil",
     },
-    resolver: zodResolver(createCustomerDtoSchema),
+    resolver: zodResolver(customerDtoSchema),
     mode: "all", // Valida onChange + onBlur
   });
   const [contactType1, contactType2] = watch(["contactType1", "contactType2"]);
@@ -97,7 +97,7 @@ export const FormCreateCustomer = () => {
     }
   }, [isDirty, isValid, action, isLoading]);
 
-  const onSubmit: SubmitHandler<CreateCustomerDto> = async (data) => {
+  const onSubmit: SubmitHandler<CustomerDto> = async (data) => {
     const submitResponse = await createCustomerAction(data);
 
     if (submitResponse.success) {

@@ -26,7 +26,8 @@ export default async function RootLayout({
 
       <Container
         maxWidth="md"
-        sx={{ py: 3 }}
+        // disableGutters
+        sx={{ paddingY: 3 }}
       >
         {children}
       </Container>

@@ -5,7 +5,8 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 
 import { queryClient } from "@/lib/reactQuery";
-import theme from "@/theme/theme";
+import theme from "@/theme/themeTeste";
+// import theme from "@/theme/theme";
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
   return (

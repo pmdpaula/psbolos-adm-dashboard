@@ -5,7 +5,6 @@ import {
   FormControl,
   InputLabel,
   MenuItem,
-  Paper,
   Select,
   type SelectChangeEvent,
   Stack,
@@ -14,7 +13,7 @@ import {
 import { getCookie, hasCookie, setCookie } from "cookies-next";
 import { useEffect, useState } from "react";
 
-import { NeonText } from "@/components/NeonText";
+import { GradientPaper } from "@/components/GradientPaper";
 import { companyData } from "@/data/companyData";
 import {
   BatterOptions,
@@ -102,17 +101,6 @@ const FormContract = () => {
     }));
   };
 
-  const SectionLabel = ({ label }: { label: string }) => {
-    return (
-      <NeonText
-        variant="h6"
-        gutterBottom
-      >
-        {label}
-      </NeonText>
-    );
-  };
-
   useEffect(() => {
     setCookie("formData", JSON.stringify(formData), {
       path: "/",
@@ -123,18 +111,10 @@ const FormContract = () => {
   return (
     <form>
       {formSkeleton.map((section) => (
-        <Paper
+        <GradientPaper
           key={section.step}
-          sx={{
-            p: 2,
-            mb: 2,
-            // backgroundColor: "#65003dff" /* fallback for old browsers */,
-            background:
-              "linear-gradient(to top, #1e062bff, #65003dff)" /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */,
-          }}
+          label={section.label}
         >
-          <SectionLabel label={section.label} />
-
           <Stack
             spacing={2}
             mb={2}
@@ -216,7 +196,7 @@ const FormContract = () => {
               </Box>
             ))}
           </Stack>
-        </Paper>
+        </GradientPaper>
       ))}
     </form>
   );
