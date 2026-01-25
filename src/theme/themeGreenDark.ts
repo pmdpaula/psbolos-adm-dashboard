@@ -1,44 +1,8 @@
 // theme.ts
+import "./baseTheme"; // Importa as declarações de módulo
+
 import { alpha, createTheme, PaletteMode } from "@mui/material/styles";
 import type {} from "@mui/material/themeCssVarsAugmentation";
-
-// Declaração de módulo para estender a paleta do Material UI
-declare module "@mui/material/styles" {
-  interface Palette {
-    tertiary: Palette["primary"];
-    gradient1: Palette["primary"];
-    gradient2: Palette["primary"];
-  }
-  interface PaletteOptions {
-    tertiary?: PaletteOptions["primary"];
-    gradient1?: PaletteOptions["primary"];
-    gradient2?: PaletteOptions["primary"];
-  }
-}
-
-declare module "@mui/material/Button" {
-  interface ButtonPropsColorOverrides {
-    tertiary: true;
-    gradient1: true;
-    gradient2: true;
-  }
-}
-
-declare module "@mui/material/Paper" {
-  interface PaperPropsColorOverrides {
-    tertiary: true;
-    gradient1: true;
-    gradient2: true;
-  }
-}
-
-declare module "@mui/material/Chip" {
-  interface ChipPropsColorOverrides {
-    tertiary: true;
-    gradient1: true;
-    gradient2: true;
-  }
-}
 
 // Cores fornecidas
 const colors = {

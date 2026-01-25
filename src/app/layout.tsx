@@ -1,5 +1,6 @@
 import "@/app/globals.css";
 
+import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 import type { Metadata } from "next";
 import { Ephesis, Roboto } from "next/font/google";
 
@@ -34,6 +35,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${roboto.variable} ${ephesis.variable}`}
+      suppressHydrationWarning
     >
       <head>
         <link
@@ -42,6 +44,10 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <InitColorSchemeScript
+          attribute="class"
+          defaultMode="dark"
+        />
         <Providers>{children}</Providers>
       </body>
     </html>
