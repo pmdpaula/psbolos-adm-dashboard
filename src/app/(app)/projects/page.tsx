@@ -1,28 +1,16 @@
 "use client";
 
 import CakeIcon from "@mui/icons-material/Cake";
-import {
-  Box,
-  Button,
-  Icon,
-  Skeleton,
-  Stack,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Button, Skeleton, Stack, Tooltip, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { Button2 } from "@/components/glass/Button2";
-import { Button3 } from "@/components/glass/Button3";
-import { NewButton } from "@/components/glass/NewButton";
 import { getDeliveryModes } from "@/http/data-types/get-delivery-modes";
 import { getEventTypes } from "@/http/data-types/get-event-types";
 import { getProjectStatuses } from "@/http/data-types/get-project-statuses";
 import { getProjects } from "@/http/project/get-projects";
 
-import { ProjectDataTable } from "./ProjectDataTable";
 import { ProjectsList } from "./ProjectsList";
 
 const ProjectPage = () => {

@@ -11,7 +11,7 @@ export async function isAuthenticated() {
   return !!result;
 }
 
-export async function auth() {
+export async function checkAuthentication() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
 
@@ -25,9 +25,8 @@ export async function auth() {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     // console.log("🚀 ~ auth ~ error:", error);
+    redirect("/api/auth/sign-out");
   }
-
-  redirect("/api/auth/sign-out");
 }
 
 // export async function getCurrentOrganization() {

@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { isAuthenticated } from "@/auth/auth";
-import { getProfile } from "@/http/user/get-profile";
+import { checkAuthentication } from "@/auth/auth";
 
 import { ProjectProvider } from "./ProjectContext";
 
@@ -10,11 +9,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  if (!(await isAuthenticated())) {
-    redirect("/auth/sign-in");
-  }
-
-  const { user } = await getProfile();
+  const { user } = await checkAuthentication();
 
   if (user.userRole !== "ADMIN") {
     redirect("/about");

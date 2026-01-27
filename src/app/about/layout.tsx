@@ -1,7 +1,6 @@
 import { Container } from "@mui/material";
-import { redirect } from "next/navigation";
 
-import { isAuthenticated } from "@/auth/auth";
+import { checkAuthentication } from "@/auth/auth";
 import { Header } from "@/components/Header";
 
 export default async function RootLayout({
@@ -9,9 +8,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  if (!(await isAuthenticated())) {
-    redirect("/auth/sign-in");
-  }
+  await checkAuthentication();
 
   return (
     <main>

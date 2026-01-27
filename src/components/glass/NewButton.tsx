@@ -6,7 +6,7 @@ const NeonButton = styled(Button)(({ theme }) => ({
   padding: "16px 32px",
   fontSize: "16px",
   fontWeight: 700,
-  letterSpacing: "1px",
+  letterSpacing: theme.spacing(0.5),
   textTransform: "uppercase",
   color: "#fff",
   background:

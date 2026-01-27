@@ -7,7 +7,7 @@ import { use, useEffect, useState } from "react";
 
 import type { ProjectFullDataDto } from "@/data/dto/project-dto";
 
-import { getProjectFullDataByIdAction } from "../connect/actions";
+import { getProjectFullDataByIdAction } from "../../action";
 
 const fetchFullProjectData = async (projectId: string) => {
   const projectFullDataInDb = await getProjectFullDataByIdAction(projectId);
