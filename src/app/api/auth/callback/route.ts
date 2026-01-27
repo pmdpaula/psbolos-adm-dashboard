@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     maxAge: 60 * 60 * 24 * 7, // 7 days
     // httpOnly: true,
     // sameSite: "lax",
-    // secure: process.env.NODE_ENV === "production",
+    secure: process.env.NODE_ENV === "production",
   });
 
   // const inviteId = (await cookies()).get("inviteId")?.value;

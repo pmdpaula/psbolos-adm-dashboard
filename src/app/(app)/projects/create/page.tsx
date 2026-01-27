@@ -11,7 +11,6 @@ const ProjectCreatePage = () => {
       justifyContent="center"
       alignItems="center"
       flexDirection="column"
-      // my={4}
       width="100%"
     >
       <FormCreateProject />

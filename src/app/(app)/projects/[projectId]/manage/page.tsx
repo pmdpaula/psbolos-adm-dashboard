@@ -1,12 +1,21 @@
 "use client";
 
+import { Stack, Typography } from "@mui/material";
 import { Suspense, use, useEffect, useState } from "react";
 
-import type { ProjectFullDataDto } from "@/data/dto/project-dto";
+import { useMainContext } from "@/app/MainContext";
+import GlassButton from "@/components/glass/GlassButton";
+import GlassCard from "@/components/glass/GlassCard";
+import { MainContextSnackbar } from "@/components/MainContextSnackbar";
+import {
+  type ProjectFullDataDto,
+  transformProjectFullDataDtoToProjectDto,
+} from "@/data/dto/project-dto";
 import { getProjectFullDataById } from "@/http/project/get-project-full-data-by-id";
 
+import { editProjectAction } from "../../action";
 import { ProjectHeader } from "../../components/ProjectHeader";
-import { ProjectResume } from "../../components/ProjectResume";
+import { ProjectSummary } from "../../components/ProjectSummary";
 import { ManageProjectOptions } from "./ManageProjectOptions";
 
 interface ManageProjectPageProps {
@@ -14,9 +23,13 @@ interface ManageProjectPageProps {
 }
 
 const ManageProjectPage = ({ params }: ManageProjectPageProps) => {
+  const { setOpenAlertSnackBar } = useMainContext();
+
   const { projectId } = use(params);
 
   const [project, setProject] = useState<ProjectFullDataDto | null>(null);
+
+  const cancelledColor = "warning";
 
   useEffect(() => {
     const checkAvaibilityOfAProject = async () => {
@@ -25,29 +38,82 @@ const ManageProjectPage = ({ params }: ManageProjectPageProps) => {
     };
 
     checkAvaibilityOfAProject();
-  }, [projectId]);
+  }, []);
+
+  async function ProjectResume() {
+    const normalizedProject = {
+      ...transformProjectFullDataDtoToProjectDto(project!),
+      statusCode: "PLANNING",
+    };
+
+    const resumedProject = {
+      ...normalizedProject,
+    };
+
+    const response = await editProjectAction(resumedProject);
+
+    setOpenAlertSnackBar({
+      isOpen: true,
+      success: response.success,
+      message: response.success
+        ? "Projeto reativado com sucesso!"
+        : response.message,
+      errorCode: response.errors,
+    });
+
+    setProject(await getProjectFullDataById({ id: projectId }));
+  }
 
   return (
     <Suspense>
       {project && (
-        <>
-          {/* <Stack
+        <Stack>
+          <Stack
             justifyContent="center"
             alignItems="center"
             mb={2}
-          > */}
-          <ProjectHeader
-            projectId={project.id}
-            name={project.name}
-            description={project.description}
-          />
-          {/* </Stack> */}
+          >
+            <ProjectHeader
+              projectId={project.id}
+              name={project.name}
+              description={project.description}
+            />
 
-          <ProjectResume projectFullData={project} />
+            <ProjectSummary projectFullData={project} />
+          </Stack>
 
-          <ManageProjectOptions project={project} />
-        </>
+          {project.status.code === "CANCELLED" ? (
+            <GlassCard color={cancelledColor}>
+              <Stack
+                justifyContent="center"
+                alignItems="center"
+                spacing={2}
+              >
+                <Typography
+                  variant="h6"
+                  color="textSecondary"
+                  textAlign="center"
+                >
+                  Este projeto está cancelado e não pode ser gerenciado.
+                </Typography>
+
+                <GlassButton
+                  variant="contained"
+                  onClick={() => ProjectResume()}
+                  color="success"
+                  sx={{ paddingX: 4, paddingY: 2 }}
+                >
+                  Reativar
+                </GlassButton>
+              </Stack>
+            </GlassCard>
+          ) : (
+            <ManageProjectOptions project={project} />
+          )}
+        </Stack>
       )}
+
+      <MainContextSnackbar />
     </Suspense>
   );
 };

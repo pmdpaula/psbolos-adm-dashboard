@@ -20,7 +20,7 @@ export async function signInWithEmailAndPassword(data: SignInFormData) {
       maxAge: 60 * 60 * 24 * 7, // 7 days
       // httpOnly: true,
       // sameSite: "lax",
-      // secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "production",
       path: "/",
     });
   } catch (error) {

@@ -6,6 +6,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 
 import { queryClient } from "@/lib/reactQuery";
 import theme from "@/theme/themeGreenDark";
+
+import { MainProvider } from "./MainContext";
 // import theme from "@/theme/theme";
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
@@ -16,7 +18,7 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
           theme={theme}
           disableTransitionOnChange
         >
-          {children}
+          <MainProvider>{children}</MainProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </AppRouterCacheProvider>

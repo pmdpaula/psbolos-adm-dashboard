@@ -1,14 +1,14 @@
 "use client";
 
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import ArchitectureIcon from "@mui/icons-material/Architecture";
+import AttributionIcon from "@mui/icons-material/Attribution";
 import BadgeIcon from "@mui/icons-material/Badge";
+import EngineeringIcon from "@mui/icons-material/Engineering";
+import HailIcon from "@mui/icons-material/Hail";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import PersonPinCircleIcon from "@mui/icons-material/PersonPinCircle";
 import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
 import SyncIcon from "@mui/icons-material/Sync";
 import {
-  Alert,
   Badge,
   Box,
   Button,
@@ -19,19 +19,19 @@ import {
   List,
   ListItem,
   ListItemIcon,
-  Snackbar,
-  type SnackbarCloseReason,
   Stack,
   Tooltip,
   Typography,
   useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 
+import { useMainContext } from "@/app/MainContext";
 import { GradientPaper } from "@/components/GradientPaper";
+import { MainContextSnackbar } from "@/components/MainContextSnackbar";
 import { StyledSwitch } from "@/components/StyledSwitch";
 import type { CollaborationFull } from "@/data/dto/collaboration-dto";
-import theme from "@/theme/theme";
 
 import { useProjectContext } from "../../ProjectContext";
 import { disconnectCollaboratorAction } from "./actions";
@@ -48,9 +48,10 @@ export const AlreadyConnectedCustomers = ({
   setCollaborations,
   projectId,
 }: AlreadyConnectedCustomersProps) => {
+  const { setOpenAlertSnackBar } = useMainContext();
+  const { setRefreshKey } = useProjectContext();
+  const theme = useTheme();
   const isBreakpointMinusMd = useMediaQuery(theme.breakpoints.down("sm"));
-  const { openAlertSnackBar, setOpenAlertSnackBar, setRefreshKey } =
-    useProjectContext();
 
   const [collaborationsToDisconnect, setCollaborationsToDisconnect] = useState<
     string[]
@@ -60,6 +61,9 @@ export const AlreadyConnectedCustomers = ({
 
   function setComponentColor(code: string) {
     switch (code) {
+      case "CUSTOMER":
+        return "tertiary";
+
       case "PLANNER":
         return "primary";
 
@@ -79,11 +83,14 @@ export const AlreadyConnectedCustomers = ({
 
   function setIconCollaborator(code: string) {
     switch (code) {
+      case "CUSTOMER":
+        return <AttributionIcon color={setComponentColor(code)} />;
+
       case "PLANNER":
-        return <ArchitectureIcon color={setComponentColor(code)} />;
+        return <EngineeringIcon color={setComponentColor(code)} />;
 
       case "CONTRACTOR":
-        return <PersonPinCircleIcon color={setComponentColor(code)} />;
+        return <HailIcon color={setComponentColor(code)} />;
 
       case "TRANSPORTER":
         return <LocalShippingIcon color={setComponentColor(code)} />;
@@ -140,29 +147,12 @@ export const AlreadyConnectedCustomers = ({
     setRefreshKey((prevKey) => prevKey + 1);
   }
 
-  function handleCloseAlert(
-    event?: React.SyntheticEvent | Event,
-    reason?: SnackbarCloseReason,
-  ) {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setOpenAlertSnackBar({
-      isOpen: false,
-      success: true,
-      message: "",
-      errorCode: null,
-    });
-  }
-
   useEffect(() => {
     setIsButtonDisabled(collaborationsToDisconnect.length === 0);
   }, [collaborationsToDisconnect]);
 
   return (
     <>
-      {/* {collaborations.length > 0 && ( */}
       <GradientPaper
         label={
           <Stack
@@ -224,19 +214,20 @@ export const AlreadyConnectedCustomers = ({
                           alignItems: "center",
                         }}
                       >
+                        {/* TODO: Configurar rotas de collaborators para CRUD */}
+                        {/* <Link href={}> */}
                         <ListItemIcon sx={{ width: 40 }}>
                           {setIconCollaborator(
                             collaboration.collaboratorType.code,
                           )}
                         </ListItemIcon>
-
                         <Typography
                           variant="body1"
                           sx={{ marginRight: 2 }}
                         >
                           {collaboration.customer!.name}
                         </Typography>
-
+                        {/* </Link> */}
                         <Chip
                           label={collaboration.collaboratorType.name}
                           color={typeColor}
@@ -266,7 +257,7 @@ export const AlreadyConnectedCustomers = ({
                       </FormControl>
                     </ListItem>
 
-                    <Divider variant="inset" />
+                    <Divider />
                   </Box>
                 );
               },
@@ -285,32 +276,8 @@ export const AlreadyConnectedCustomers = ({
           </form>
         </List>
       </GradientPaper>
-      {/* )} */}
 
-      <Snackbar
-        open={openAlertSnackBar.isOpen}
-        autoHideDuration={5000}
-        onClose={handleCloseAlert}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        {openAlertSnackBar.success ? (
-          <Alert
-            onClose={handleCloseAlert}
-            severity="success"
-            sx={{ textAlign: "right" }}
-          >
-            {openAlertSnackBar.message}
-          </Alert>
-        ) : (
-          <Alert
-            onClose={handleCloseAlert}
-            severity="error"
-            sx={{ textAlign: "right" }}
-          >
-            {openAlertSnackBar.message}
-          </Alert>
-        )}
-      </Snackbar>
+      <MainContextSnackbar />
     </>
   );
 };

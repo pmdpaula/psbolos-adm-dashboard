@@ -1,8 +1,10 @@
 "use client";
 
 import { Paper } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { type PaletteColor, styled, useTheme } from "@mui/material/styles";
 import React from "react";
+
+import type { PaletteColorKey } from "@/theme/baseTheme";
 
 // Criamos o componente estilizado que recebe a cor como prop
 const StyledProPaper = styled(Paper, {
@@ -14,7 +16,7 @@ const StyledProPaper = styled(Paper, {
   backgroundColor: "#0a1010", // Fundo escuro base
   backgroundImage: `radial-gradient(circle at 50% -20%, ${color}44 0%, transparent 70%)`,
   border: `1px solid ${color}33`,
-  color: "#fff",
+  color: theme.palette.text.primary,
   overflow: "hidden",
   boxShadow: `0 20px 40px rgba(0,0,0,0.4), 0 0 20px ${color}11`,
 
@@ -33,11 +35,20 @@ const StyledProPaper = styled(Paper, {
 }));
 
 interface GlassCardProps extends React.ComponentProps<typeof Paper> {
-  color: string;
+  color?: PaletteColorKey;
   children: React.ReactNode;
 }
 
-const GlassCard = ({ color, children, ...props }: GlassCardProps) => {
+const GlassCard = ({
+  color = "primary",
+  children,
+  ...props
+}: GlassCardProps) => {
+  const theme = useTheme();
+
+  const paletteColor = theme.palette[color] as PaletteColor;
+  color = paletteColor.main as PaletteColorKey;
+
   return (
     <StyledProPaper
       color={color}

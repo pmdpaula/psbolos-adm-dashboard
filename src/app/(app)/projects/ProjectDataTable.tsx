@@ -2,14 +2,10 @@
 
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import EditIcon from "@mui/icons-material/Edit";
-import { Box } from "@mui/material";
-import Alert from "@mui/material/Alert";
-import Snackbar, { SnackbarCloseReason } from "@mui/material/Snackbar";
 import {
   DataGrid,
   GridActionsCellItem,
   GridColDef,
-  type GridRowModel,
   type GridRowModesModel,
   type GridRowsProp,
 } from "@mui/x-data-grid";
@@ -17,15 +13,11 @@ import { ptBR } from "@mui/x-data-grid/locales";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import FullScreenDialog from "@/components/FullScreenDialog";
+import { MainContextSnackbar } from "@/components/MainContextSnackbar";
 import type { DeliveryModeDto } from "@/data/dto/data-types/delivery-mode-dto";
 import type { EventTypeDto } from "@/data/dto/data-types/event-type-dto";
 import type { ProjectStatusDto } from "@/data/dto/data-types/project-status-dto";
 import type { ProjectDto } from "@/data/dto/project-dto";
-
-import type { ActionFormProps } from "../customer/page";
-import { FormProject } from "./FormProject";
-import { useProjectContext } from "./ProjectContext";
 
 declare module "@mui/x-data-grid" {
   interface ToolbarPropsOverrides {
@@ -51,40 +43,9 @@ export const ProjectDataTable = ({
   projectStatuses,
   isReadingData,
 }: ProjectDataTableProps) => {
-  const { openAlertSnackBar, setOpenAlertSnackBar, openForm, setOpenForm } =
-    useProjectContext();
-
   const router = useRouter();
 
   const [rows, setRows] = useState<ProjectDto[]>([]);
-  const [project, setProject] = useState<ProjectDto>({} as ProjectDto);
-
-  function handleCallForm(action: ActionFormProps, row: GridRowModel) {
-    let projectData: ProjectDto;
-
-    if (action === "edit" || action === "delete") {
-      projectData = {
-        id: row.id,
-        name: row.name,
-        description: row.description,
-        eventTypeCode: row.eventTypeCode,
-        eventDate: row.eventDate,
-        localName: row.localName,
-        deliveryModeCode: row.deliveryModeCode,
-        shippingCost: row.shippingCost,
-        address: row.address,
-        city: row.city,
-        state: row.state,
-        statusCode: row.statusCode,
-      };
-    } else {
-      projectData = row as ProjectDto;
-    }
-
-    // setProjectContext(projectData);
-    setProject(projectData);
-    setOpenForm(true);
-  }
 
   const projectsColumns: GridColDef<ProjectDto>[] = [
     {
@@ -109,7 +70,7 @@ export const ProjectDataTable = ({
             icon={<DeleteIcon />}
             label="Delete"
             onClick={() => {
-              handleCallForm("delete", row);
+              router.push(`/projects/${row.id}/delete`);
             }}
             color="inherit"
           />,
@@ -242,92 +203,40 @@ export const ProjectDataTable = ({
     },
   ];
 
-  function handleCloseAlert(
-    event?: React.SyntheticEvent | Event,
-    reason?: SnackbarCloseReason,
-  ) {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setOpenAlertSnackBar({
-      isOpen: false,
-      success: true,
-      message: "",
-      errorCode: null,
-    });
-  }
-
   useEffect(() => {
     if (isReadingData === false) {
       setRows(projects);
     }
-  }, []);
+  }, [isReadingData]);
 
   return (
     <>
-      <Box>
-        <DataGrid
-          localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
-          rows={rows}
-          columns={projectsColumns}
-          loading={isReadingData}
-          initialState={{
-            columns: {
-              columnVisibilityModel: {
-                id: false,
-                localName: false,
-                city: false,
-                state: false,
-              },
+      <DataGrid
+        localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
+        rows={rows}
+        columns={projectsColumns}
+        loading={isReadingData}
+        initialState={{
+          columns: {
+            columnVisibilityModel: {
+              id: false,
+              localName: false,
+              city: false,
+              state: false,
             },
-            pagination: {
-              paginationModel: {
-                pageSize: 20,
-              },
+          },
+          pagination: {
+            paginationModel: {
+              pageSize: 20,
             },
-          }}
-          disableRowSelectionOnClick
-          pageSizeOptions={[10, 20, 50, 100]}
-          showToolbar
-        />
-      </Box>
+          },
+        }}
+        disableRowSelectionOnClick
+        pageSizeOptions={[10, 20, 50, 100]}
+        showToolbar
+      />
 
-      <FullScreenDialog
-        isOpened={openForm}
-        onClose={() => setOpenForm(false)}
-        title={"Excluir Projeto"}
-      >
-        <FormProject
-          action="delete"
-          projectData={project}
-        />
-      </FullScreenDialog>
-
-      <Snackbar
-        open={openAlertSnackBar.isOpen}
-        autoHideDuration={6000}
-        onClose={handleCloseAlert}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        {openAlertSnackBar.success ? (
-          <Alert
-            onClose={handleCloseAlert}
-            severity="success"
-            sx={{ textAlign: "right" }}
-          >
-            {openAlertSnackBar.message}
-          </Alert>
-        ) : (
-          <Alert
-            onClose={handleCloseAlert}
-            severity="error"
-            sx={{ textAlign: "right" }}
-          >
-            {openAlertSnackBar.message}
-          </Alert>
-        )}
-      </Snackbar>
+      <MainContextSnackbar />
     </>
   );
 };

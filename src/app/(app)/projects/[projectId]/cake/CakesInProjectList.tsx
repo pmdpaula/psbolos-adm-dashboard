@@ -21,6 +21,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 
+import { useMainContext } from "@/app/MainContext";
 import { GradientPaper } from "@/components/GradientPaper";
 import { StyledSwitch } from "@/components/StyledSwitch";
 import type { CakeDto } from "@/data/dto/cake-dto";
@@ -37,13 +38,10 @@ export const CakesInProjectList = ({
   // setCakes,
   projectId,
 }: CakesInProjectListProps) => {
+  const { setRefreshKey } = useProjectContext();
+  const { setOpenAlertSnackBar } = useMainContext();
   const theme = useTheme();
   const isBreakpointMinusMd = useMediaQuery(theme.breakpoints.up("sm"));
-  console.log(
-    "🚀 ~ CakesInProjectList ~ isBreakpointMinusMd:",
-    isBreakpointMinusMd,
-  );
-  const { setOpenAlertSnackBar, setRefreshKey } = useProjectContext();
 
   // const [project, setProject] = useState<ProjectFullDataDto | null>(null);
   const [cakes, setCakes] = useState<CakeDto[]>([]);

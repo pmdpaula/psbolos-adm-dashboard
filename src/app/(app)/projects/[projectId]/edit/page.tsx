@@ -19,13 +19,13 @@ import { use, useEffect, useState } from "react";
 import type { ProjectDto } from "@/data/dto/project-dto";
 
 import { FormProject } from "../../FormProject";
-import { getProjectByIdAction } from "./action";
+import { getProjectByIdAction } from "../actions";
 
-interface ConnectCollaboratorsPageProps {
+interface EditProjectPageProps {
   params: Promise<{ projectId: string }>;
 }
 
-const EditProjectPage = ({ params }: ConnectCollaboratorsPageProps) => {
+const EditProjectPage = ({ params }: EditProjectPageProps) => {
   const { projectId } = use(params);
   const theme = useTheme();
   const isBreakpointSm = useMediaQuery(theme.breakpoints.down("sm"));

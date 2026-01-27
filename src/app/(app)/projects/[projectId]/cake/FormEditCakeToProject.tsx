@@ -22,6 +22,7 @@ import {
   useForm,
 } from "react-hook-form";
 
+import { useMainContext } from "@/app/MainContext";
 import { StyledFormHelperText } from "@/components/form-fields/StyledFormHelperText";
 import { StyledOutlinedInput } from "@/components/form-fields/StyledOutlinedInput";
 import { GradientPaper } from "@/components/GradientPaper";
@@ -39,7 +40,8 @@ interface FormEditCakeToProjectProps {
 }
 
 export const FormEditCakeToProject = ({ cake }: FormEditCakeToProjectProps) => {
-  const { setOpenAlertSnackBar, setRefreshKey } = useProjectContext();
+  const { setOpenAlertSnackBar } = useMainContext();
+  const { setRefreshKey } = useProjectContext();
 
   const { data: cakeBattersData, isLoading: isLoadingCakeBatters } = useQuery({
     queryKey: ["cake-batters"],

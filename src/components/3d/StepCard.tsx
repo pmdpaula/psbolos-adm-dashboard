@@ -10,7 +10,7 @@ import {
 import { darken, lighten, styled, useTheme } from "@mui/material/styles";
 import React from "react";
 
-import theme from "@/theme/themeTeste";
+import theme from "@/theme/themeGreenDark";
 
 // 1. Definição da Interface para as Props
 interface StepCardProps {

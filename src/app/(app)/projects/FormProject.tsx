@@ -4,9 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import BackspaceIcon from "@mui/icons-material/Backspace";
 import SaveIcon from "@mui/icons-material/Save";
 import {
-  Alert,
   Backdrop,
-  Box,
   Button,
   CircularProgress,
   FormControl,
@@ -14,8 +12,6 @@ import {
   MenuItem,
   Select,
   type SelectChangeEvent,
-  Snackbar,
-  type SnackbarCloseReason,
   Stack,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
@@ -29,6 +25,7 @@ import {
   useForm,
 } from "react-hook-form";
 
+import { useMainContext } from "@/app/MainContext";
 import { StyledFormHelperText } from "@/components/form-fields/StyledFormHelperText";
 import { StyledInput } from "@/components/form-fields/StyledInput";
 import { StyledOutlinedInput } from "@/components/form-fields/StyledOutlinedInput";
@@ -38,13 +35,11 @@ import { getDeliveryModes } from "@/http/data-types/get-delivery-modes";
 import { getEventTypes } from "@/http/data-types/get-event-types";
 import { getProjectStatuses } from "@/http/data-types/get-project-statuses";
 
+import { getProjectByIdAction } from "./[projectId]/actions";
 import { editProjectAction } from "./action";
-import { getProjectByIdAction } from "./create/actions";
 import { useProjectContext } from "./ProjectContext";
 
 const typedResolver = zodResolver(projectDtoSchema) as Resolver<ProjectDto>;
-
-// const snackbarDuration = 6000;
 
 interface FormProjectProps {
   action: "edit" | "delete";
@@ -52,8 +47,8 @@ interface FormProjectProps {
 }
 
 export const FormProject = ({ action, projectData }: FormProjectProps) => {
-  const { openAlertSnackBar, setOpenAlertSnackBar, setProjectContext } =
-    useProjectContext();
+  const { setOpenAlertSnackBar } = useMainContext();
+  const { setProjectContext } = useProjectContext();
 
   const router = useRouter();
 
@@ -91,7 +86,7 @@ export const FormProject = ({ action, projectData }: FormProjectProps) => {
       description: projectData.description,
       eventTypeCode: projectData.eventTypeCode || eventTypeSelected,
       eventDate: projectData.eventDate.split("T")[0],
-      localName: projectData.localName || null,
+      localName: projectData.localName || "",
       deliveryModeCode: projectData.deliveryModeCode || deliveryModeSelected,
       shippingCost: projectData.shippingCost || 0,
       address: projectData.address || "",
@@ -157,51 +152,111 @@ export const FormProject = ({ action, projectData }: FormProjectProps) => {
     }
   }, [isValid]);
 
-  const onSubmit: SubmitHandler<ProjectDto> = async (data) => {
-    console.log("Submeteu o formulário com dados:", data);
+  // async function deleteProject(projectId: string) {}
 
+  // const handleDeleteProject = async (
+  //   deleteConfirmation: DeleteConfirmationType,
+  // ) => {
+  //   setIsButtonDisabled(true);
+
+  //   setOpenDeleteConfirmation(true);
+
+  //   const response = await handleDialogSelection(deleteConfirmation);
+
+  //   return {
+  //     success: response.success,
+  //     message: response.message,
+  //     errors: response.errors,
+  //   };
+  // };
+
+  // const handleDialogSelection = async (
+  //   deleteConfirmation: DeleteConfirmationType,
+  // ) => {
+  //   setDeleteConfirmation(deleteConfirmation);
+
+  //   if (deleteConfirmation === "yes") {
+  //     const deleteResponse = await deleteProjectAction(projectData.id);
+  //     setDeleteConfirmation(null);
+  //     setOpenDeleteConfirmation(false);
+  //     setIsButtonDisabled(false);
+
+  //     return deleteResponse;
+  //   } else if (deleteConfirmation === "cancel") {
+  //     const cancelledProject = {
+  //       ...projectData,
+  //       statusCode: "CANCELLED",
+  //     };
+
+  //     const response = await editProjectAction(cancelledProject);
+
+  //     setDeleteConfirmation(null);
+  //     setOpenDeleteConfirmation(false);
+  //     setIsButtonDisabled(false);
+
+  //     return {
+  //       success: response.success,
+  //       message: response.message,
+  //       errors: response.errors,
+  //     };
+  //   } else {
+  //     setDeleteConfirmation(null);
+  //     setOpenDeleteConfirmation(false);
+  //     setIsButtonDisabled(false);
+
+  //     return {
+  //       success: false,
+  //       message: "Ação de exclusão cancelada.",
+  //       errors: null,
+  //     };
+  //   }
+  // };
+
+  const onSubmit: SubmitHandler<ProjectDto> = async (data) => {
     setIsButtonDisabled(true);
 
-    const submitResponse = await editProjectAction(data);
+    if (action === "edit") {
+      const submitResponse = await editProjectAction(data);
 
-    if (submitResponse.success) {
-      const editedProject = await getProjectByIdAction(data.id);
+      if (submitResponse.success) {
+        const editedProject = await getProjectByIdAction(data.id);
 
-      setProjectContext(editedProject);
+        setProjectContext(editedProject);
 
-      setCookie("newProject", JSON.stringify(editedProject), {
-        path: "/",
-        maxAge: 60 * 60 * 24 * 5, // 5 days
+        setCookie("newProject", JSON.stringify(editedProject), {
+          path: "/",
+          maxAge: 60 * 60 * 24 * 5, // 5 days
+        });
+
+        router.refresh();
+      } else {
+        setIsButtonDisabled(false);
+      }
+
+      setOpenAlertSnackBar({
+        isOpen: true,
+        success: submitResponse.success,
+        message: submitResponse.message,
+        errorCode: submitResponse.errors,
       });
-
-      router.refresh();
-    } else {
-      setIsButtonDisabled(false);
     }
-
-    setOpenAlertSnackBar({
-      isOpen: true,
-      success: submitResponse.success,
-      message: submitResponse.message,
-      errorCode: submitResponse.errors,
-    });
   };
 
-  function handleCloseAlert(
-    event?: React.SyntheticEvent | Event,
-    reason?: SnackbarCloseReason,
-  ) {
-    if (reason === "clickaway") {
-      return;
-    }
+  // function handleCloseAlert(
+  //   event?: React.SyntheticEvent | Event,
+  //   reason?: SnackbarCloseReason,
+  // ) {
+  //   if (reason === "clickaway") {
+  //     return;
+  //   }
 
-    setOpenAlertSnackBar({
-      isOpen: false,
-      success: true,
-      message: "",
-      errorCode: null,
-    });
-  }
+  //   setOpenAlertSnackBar({
+  //     isOpen: false,
+  //     success: true,
+  //     message: "",
+  //     errorCode: null,
+  //   });
+  // }
 
   return (
     <>
@@ -331,6 +386,7 @@ export const FormProject = ({ action, projectData }: FormProjectProps) => {
 
                       <Select
                         labelId="select-label-eventTypeCode"
+                        variant={action === "delete" ? "standard" : "outlined"}
                         id="eventTypeCode"
                         {...field}
                         value={field.value || ""}
@@ -420,14 +476,24 @@ export const FormProject = ({ action, projectData }: FormProjectProps) => {
                     Local do Evento
                   </InputLabel>
 
-                  <StyledOutlinedInput
-                    size="small"
-                    id="registerNumber"
-                    label="CPF/CNPJ"
-                    {...field}
-                    value={field.value || ""}
-                    error={errors.localName ? true : false}
-                  />
+                  {action === "delete" ? (
+                    <StyledInput
+                      size="small"
+                      id="localName"
+                      {...field}
+                      value={field.value}
+                      disabled={action === "delete"}
+                    />
+                  ) : (
+                    <StyledOutlinedInput
+                      size="small"
+                      id="localName"
+                      label="Local do Evento"
+                      {...field}
+                      value={field.value || ""}
+                      error={errors.localName ? true : false}
+                    />
+                  )}
 
                   <StyledFormHelperText component="p">
                     {errors.localName?.message}
@@ -460,14 +526,14 @@ export const FormProject = ({ action, projectData }: FormProjectProps) => {
                       <Select
                         labelId="select-label-deliveryModeCode"
                         id="deliveryModeCode"
+                        variant={action === "delete" ? "standard" : "outlined"}
                         {...field}
                         value={field.value || ""}
                         label="Tipo de Entrega"
                         size="small"
+                        disabled={action === "delete"}
                         onChange={handleChangeDeliveryMode}
                       >
-                        {/* <MenuItem>...</MenuItem> */}
-
                         {deliveryModesData?.deliveryModes.map((mode) => {
                           return (
                             <MenuItem
@@ -504,15 +570,27 @@ export const FormProject = ({ action, projectData }: FormProjectProps) => {
                   >
                     Valor da entrega
                   </InputLabel>
-                  <StyledOutlinedInput
-                    size="small"
-                    id="shippingCost"
-                    label="Valor da entrega"
-                    type="number"
-                    {...field}
-                    value={field.value || 0}
-                    error={errors.shippingCost ? true : false}
-                  />
+
+                  {action === "delete" ? (
+                    <StyledInput
+                      size="small"
+                      id="shippingCost"
+                      {...field}
+                      value={field.value}
+                      type="number"
+                      disabled={action === "delete"}
+                    />
+                  ) : (
+                    <StyledOutlinedInput
+                      size="small"
+                      id="shippingCost"
+                      label="Valor da entrega"
+                      type="number"
+                      {...field}
+                      value={field.value || ""}
+                      error={errors.shippingCost ? true : false}
+                    />
+                  )}
 
                   <StyledFormHelperText component="p">
                     {errors.shippingCost?.message}
@@ -536,14 +614,25 @@ export const FormProject = ({ action, projectData }: FormProjectProps) => {
                   >
                     Endereço
                   </InputLabel>
-                  <StyledOutlinedInput
-                    size="small"
-                    id="address"
-                    label="Endereço"
-                    {...field}
-                    value={field.value || ""}
-                    error={errors.address ? true : false}
-                  />
+
+                  {action === "delete" ? (
+                    <StyledInput
+                      size="small"
+                      id="address"
+                      {...field}
+                      value={field.value}
+                      disabled={action === "delete"}
+                    />
+                  ) : (
+                    <StyledOutlinedInput
+                      size="small"
+                      id="address"
+                      label="Endereço"
+                      {...field}
+                      value={field.value || ""}
+                      error={errors.address ? true : false}
+                    />
+                  )}
 
                   <StyledFormHelperText component="p">
                     {errors.address?.message}
@@ -567,14 +656,25 @@ export const FormProject = ({ action, projectData }: FormProjectProps) => {
                   >
                     Cidade
                   </InputLabel>
-                  <StyledOutlinedInput
-                    size="small"
-                    id="city"
-                    label="Cidade"
-                    {...field}
-                    value={field.value || ""}
-                    error={errors.city ? true : false}
-                  />
+
+                  {action === "delete" ? (
+                    <StyledInput
+                      size="small"
+                      id="city"
+                      {...field}
+                      value={field.value}
+                      disabled={action === "delete"}
+                    />
+                  ) : (
+                    <StyledOutlinedInput
+                      size="small"
+                      id="city"
+                      label="Cidade"
+                      {...field}
+                      value={field.value || ""}
+                      error={errors.city ? true : false}
+                    />
+                  )}
 
                   <StyledFormHelperText component="p">
                     {errors.city?.message}
@@ -598,14 +698,25 @@ export const FormProject = ({ action, projectData }: FormProjectProps) => {
                   >
                     Estado
                   </InputLabel>
-                  <StyledOutlinedInput
-                    size="small"
-                    id="state"
-                    label="Estado"
-                    {...field}
-                    value={field.value || ""}
-                    error={errors.state ? true : false}
-                  />
+
+                  {action === "delete" ? (
+                    <StyledInput
+                      size="small"
+                      id="state"
+                      {...field}
+                      value={field.value}
+                      disabled={action === "delete"}
+                    />
+                  ) : (
+                    <StyledOutlinedInput
+                      size="small"
+                      id="state"
+                      label="Estado"
+                      {...field}
+                      value={field.value || ""}
+                      error={errors.state ? true : false}
+                    />
+                  )}
 
                   <StyledFormHelperText component="p">
                     {errors.state?.message}
@@ -638,14 +749,14 @@ export const FormProject = ({ action, projectData }: FormProjectProps) => {
                       <Select
                         labelId="select-label-statusCode"
                         id="statusCode"
+                        variant={action === "delete" ? "standard" : "outlined"}
                         {...field}
                         value={field.value}
-                        label="Tipo"
+                        disabled={action === "delete"}
+                        label="Estado do Projeto"
                         size="small"
                         onChange={handleChangeProjectStatus}
                       >
-                        {/* <MenuItem>...</MenuItem> */}
-
                         {projectStatusesData?.projectStatuses.map((mode) => {
                           return (
                             <MenuItem
@@ -676,12 +787,10 @@ export const FormProject = ({ action, projectData }: FormProjectProps) => {
           >
             <Button
               color="error"
-              // variant="outlined"
-              fullWidth
               size="large"
               sx={{ mt: 5, height: 42, maxWidth: 200 }}
               startIcon={<BackspaceIcon fontSize="small" />}
-              onClick={() => router.push("/projects")}
+              onClick={() => router.back()}
             >
               Cancelar
             </Button>
@@ -689,7 +798,7 @@ export const FormProject = ({ action, projectData }: FormProjectProps) => {
             <Button
               type="submit"
               variant="contained"
-              // color={action === "delete" ? "error" : "secondary"}
+              color="secondary"
               fullWidth
               size="large"
               sx={{ mt: 5, height: 42 }}
@@ -702,29 +811,113 @@ export const FormProject = ({ action, projectData }: FormProjectProps) => {
                 )
               }
             >
-              "Salvar"
+              "Salvar alterações"
             </Button>
           </Stack>
         </form>
       )}
 
-      <Snackbar
-        open={openAlertSnackBar.isOpen}
-        autoHideDuration={4000}
-        onClose={handleCloseAlert}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      {/* <GlassDialog
+        open={openDeleteConfirmation}
+        onClose={() => setOpenDeleteConfirmation(false)}
+        // aria-modal="false"
+        maxWidth="sm"
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        PaperComponent={(props) => (
+          <GlassCardHover
+            {...props}
+            color={dialogColor}
+            sx={{ padding: 2 }}
+          />
+        )}
+        title="Confirmação de Exclusão"
+        dialogColor={dialogColor}
       >
-        <Box>
-          <Alert
-            onClose={handleCloseAlert}
-            severity={openAlertSnackBar.success ? "success" : "error"}
-            sx={{ textAlign: "right" }}
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            <Typography
+              variant="h6"
+              gutterBottom
+              color="textPrimary"
+            >
+              {projectData.name}
+            </Typography>
+            <Typography sx={{ mb: 2 }}>
+              Tem certeza que deseja excluir este projeto?
+            </Typography>
+
+            <Box
+              color="secondary"
+              display="flex"
+              flexDirection="column"
+            >
+              <Typography variant="caption">
+                <Typography
+                  component="span"
+                  fontWeight="bold"
+                  variant="body2"
+                >
+                  Desistir:{" "}
+                </Typography>
+                fecha esta janela sem fazer nenhuma ação
+              </Typography>
+
+              <Typography variant="caption">
+                <Typography
+                  component="span"
+                  fontWeight="bold"
+                  variant="body2"
+                >
+                  Confirmar:{" "}
+                </Typography>
+                exclui o projeto permanentemente
+              </Typography>
+
+              <Typography variant="caption">
+                <Typography
+                  component="span"
+                  fontWeight="bold"
+                  variant="body2"
+                >
+                  Cancelar:{" "}
+                </Typography>
+                muda o estado do projeto para cancelado
+              </Typography>
+            </Box>
+          </DialogContentText>
+        </DialogContent>
+
+        <Stack
+          spacing={2}
+          sx={{ marginY: 2 }}
+          direction="row"
+          justifyContent="space-around"
+        >
+          <Button
+            color={dialogColor}
+            onClick={() => handleDialogSelection("no")}
           >
-            {openAlertSnackBar.message +
-              (openAlertSnackBar.success ? " Vá para o próximo passo." : "")}
-          </Alert>
-        </Box>
-      </Snackbar>
+            Desistir
+          </Button>
+
+          <Button
+            color={dialogColor}
+            onClick={() => handleDialogSelection("yes")}
+            autoFocus
+          >
+            Confirmar
+          </Button>
+
+          <Button
+            color={dialogColor}
+            onClick={() => handleDialogSelection("cancel")}
+            autoFocus
+          >
+            Cancelar
+          </Button>
+        </Stack>
+      </GlassDialog> */}
     </>
   );
 };

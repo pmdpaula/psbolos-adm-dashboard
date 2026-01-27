@@ -4,19 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import BackspaceIcon from "@mui/icons-material/Backspace";
 import SaveIcon from "@mui/icons-material/Save";
 import {
-  Alert,
   Backdrop,
-  Box,
   Button,
   CircularProgress,
   FormControl,
   InputLabel,
-  LinearProgress,
   MenuItem,
   Select,
-  type SelectChangeEvent,
-  Snackbar,
-  type SnackbarCloseReason,
   Stack,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
@@ -30,8 +24,10 @@ import {
   useForm,
 } from "react-hook-form";
 
+import { useMainContext } from "@/app/MainContext";
 import { StyledFormHelperText } from "@/components/form-fields/StyledFormHelperText";
 import { StyledOutlinedInput } from "@/components/form-fields/StyledOutlinedInput";
+import { MainContextSnackbar } from "@/components/MainContextSnackbar";
 import type { CreateProjectDto, ProjectDto } from "@/data/dto/project-dto";
 import { createProjectDtoSchema } from "@/data/dto/project-dto";
 import { getDeliveryModes } from "@/http/data-types/get-delivery-modes";
@@ -48,8 +44,8 @@ const typedResolver = zodResolver(
 const snackbarDuration = 6000;
 
 export const FormCreateProject = () => {
-  const { openAlertSnackBar, setOpenAlertSnackBar, setProjectContext } =
-    useProjectContext();
+  const { setOpenAlertSnackBar } = useMainContext();
+  const { setProjectContext } = useProjectContext();
 
   const router = useRouter();
 
@@ -78,8 +74,6 @@ export const FormCreateProject = () => {
   const {
     control,
     handleSubmit,
-    setValue,
-    // watch,
     formState: { errors, isLoading, isValid, isDirty },
   } = useForm<CreateProjectDto>({
     defaultValues: {
@@ -102,39 +96,39 @@ export const FormCreateProject = () => {
 
   const [isReadingData, setIsReadingData] = useState(true);
 
-  function handleChangeEventType(event: SelectChangeEvent<string>) {
-    const selectedType = event.target.value as string;
+  // function handleChangeEventType(event: SelectChangeEvent<string>) {
+  //   const selectedType = event.target.value as string;
 
-    if (!selectedType) {
-      setValue("eventTypeCode", "");
-    } else {
-      setValue("eventTypeCode", selectedType);
-    }
-  }
+  //   if (!selectedType) {
+  //     setValue("eventTypeCode", "");
+  //   } else {
+  //     setValue("eventTypeCode", selectedType);
+  //   }
+  // }
 
-  function handleChangeDeliveryMode(event: SelectChangeEvent<string>) {
-    const selectedType = event.target.value as string;
+  // function handleChangeDeliveryMode(event: SelectChangeEvent<string>) {
+  //   const selectedType = event.target.value as string;
 
-    if (!selectedType) {
-      setValue("deliveryModeCode", "");
-    } else {
-      setValue("deliveryModeCode", selectedType);
-    }
-  }
+  //   if (!selectedType) {
+  //     setValue("deliveryModeCode", "");
+  //   } else {
+  //     setValue("deliveryModeCode", selectedType);
+  //   }
+  // }
 
-  function handleChangeProjectStatus(event: SelectChangeEvent<string>) {
-    const selectedType = event.target.value as string;
+  // function handleChangeProjectStatus(event: SelectChangeEvent<string>) {
+  //   const selectedType = event.target.value as string;
 
-    if (!selectedType) {
-      setValue("statusCode", "");
-    } else {
-      setValue("statusCode", selectedType);
-    }
-  }
+  //   if (!selectedType) {
+  //     setValue("statusCode", "");
+  //   } else {
+  //     setValue("statusCode", selectedType);
+  //   }
+  // }
 
   const [isButtonDisabled, setIsButtonDisabled] = useState(isLoading);
 
-  const [progressStep, setProgressStep] = useState(0);
+  const [_progressStep, setProgressStep] = useState(0);
   const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -238,24 +232,6 @@ export const FormCreateProject = () => {
       }
     };
   }, []);
-
-  function handleCloseAlert(
-    event?: React.SyntheticEvent | Event,
-    reason?: SnackbarCloseReason,
-  ) {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setOpenAlertSnackBar({
-      isOpen: false,
-      success: true,
-      message: "",
-      errorCode: null,
-    });
-
-    setProgressStep(0);
-  }
 
   return (
     <>
@@ -368,7 +344,7 @@ export const FormCreateProject = () => {
                         label="Tipo de Evento"
                         size="small"
                         // autoWidth
-                        onChange={handleChangeEventType}
+                        // onChange={handleChangeEventType}
                       >
                         {eventTypesData?.eventTypes.map((type) => {
                           return (
@@ -483,7 +459,7 @@ export const FormCreateProject = () => {
                         value={field.value || ""}
                         label="Tipo de Entrega"
                         size="small"
-                        onChange={handleChangeDeliveryMode}
+                        // onChange={handleChangeDeliveryMode}
                       >
                         {/* <MenuItem>...</MenuItem> */}
 
@@ -661,7 +637,7 @@ export const FormCreateProject = () => {
                         value={field.value}
                         label="Tipo"
                         size="small"
-                        onChange={handleChangeProjectStatus}
+                        // onChange={handleChangeProjectStatus}
                       >
                         {/* <MenuItem>...</MenuItem> */}
 
@@ -695,12 +671,11 @@ export const FormCreateProject = () => {
           >
             <Button
               color="error"
-              // variant="outlined"
               fullWidth
               size="large"
               sx={{ mt: 5, height: 42, maxWidth: 200 }}
               startIcon={<BackspaceIcon fontSize="small" />}
-              onClick={() => router.push("/projects")}
+              onClick={() => router.back()}
             >
               Cancelar
             </Button>
@@ -727,37 +702,7 @@ export const FormCreateProject = () => {
         </form>
       )}
 
-      <Snackbar
-        open={openAlertSnackBar.isOpen}
-        // autoHideDuration={snackbarDuration}
-        onClose={handleCloseAlert}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        // slotProps={{
-        //   clickAwayListener: {
-        //     onClickAway: (event) => {
-        //       // Prevent's default 'onClickAway' behavior.
-        //       event.defaultMuiPrevented = true;
-        //     },
-        //   },
-        // }}
-      >
-        <Box>
-          <Alert
-            onClose={handleCloseAlert}
-            severity={openAlertSnackBar.success ? "success" : "error"}
-            sx={{ textAlign: "right" }}
-          >
-            {openAlertSnackBar.message +
-              (openAlertSnackBar.success ? " Vá para o próximo passo." : "")}
-          </Alert>
-
-          <LinearProgress
-            variant="determinate"
-            color={openAlertSnackBar.success ? "success" : "error"}
-            value={progressStep}
-          />
-        </Box>
-      </Snackbar>
+      <MainContextSnackbar />
     </>
   );
 };

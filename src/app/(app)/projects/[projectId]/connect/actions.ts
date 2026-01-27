@@ -9,13 +9,6 @@ import { fetchCollaborationsByProjectId } from "@/http/collaboration/fetch-colla
 import { fetchCustomersByProjectId } from "@/http/collaboration/fetch-customers-by-project-id";
 import { getCustomers } from "@/http/customer/get-customers";
 import { getCollaboratorTypes } from "@/http/data-types/get-collaborator-types";
-import { getProjectFullDataById } from "@/http/project/get-project-full-data-by-id";
-
-export async function getProjectFullDataByIdAction(id: string) {
-  const projectFullData = await getProjectFullDataById({ id });
-
-  return projectFullData;
-}
 
 export async function getCustomersAction() {
   const customers = await getCustomers();

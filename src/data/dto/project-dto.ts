@@ -171,3 +171,22 @@ export const projectFullDataDtoSchema = z.object({
 });
 
 export type ProjectFullDataDto = z.infer<typeof projectFullDataDtoSchema>;
+
+export function transformProjectFullDataDtoToProjectDto(
+  projectFullData: ProjectFullDataDto,
+): ProjectDto {
+  return {
+    id: projectFullData.id,
+    name: projectFullData.name,
+    description: projectFullData.description!,
+    eventDate: projectFullData.eventDate,
+    eventTypeCode: projectFullData.eventType.code,
+    deliveryModeCode: projectFullData.deliveryMode.code,
+    statusCode: projectFullData.status.code,
+    localName: projectFullData.localName,
+    shippingCost: projectFullData.shippingCost,
+    address: projectFullData.address!,
+    city: projectFullData.city!,
+    state: projectFullData.state!,
+  };
+}

@@ -1,10 +1,22 @@
+"use client";
+
 import { Badge, Grid, Icon, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 
 import GlassCardHover from "@/components/glass/GlassCardHover";
 import type { ProjectFullDataDto } from "@/data/dto/project-dto";
+import type { PaletteColorKey } from "@/theme/baseTheme";
 
-const manageOptions = [
+type ManageOptionsType = {
+  title: string;
+  description: string;
+  url: string;
+  iconName: string;
+  count: keyof ProjectFullDataDto | "none";
+  color?: PaletteColorKey;
+};
+
+const manageOptions: ManageOptionsType[] = [
   {
     title: "Editar",
     description: "Editar os dados do projeto.",
@@ -40,6 +52,14 @@ const manageOptions = [
     iconName: "payments",
     count: "payments",
   },
+  {
+    title: "Remover",
+    description: "Remover o projeto.",
+    url: "/projects/id/delete",
+    iconName: "delete_outline",
+    count: "none",
+    color: "error",
+  },
 ];
 
 interface ManageProjectOptionsProps {
@@ -73,6 +93,7 @@ export const ManageProjectOptions = ({
             >
               <GlassCardHover
                 key={option.title}
+                color={option.color ?? "primary"}
                 sx={{
                   width: 220,
                   height: 140,

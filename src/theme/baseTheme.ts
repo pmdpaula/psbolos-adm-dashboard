@@ -38,3 +38,46 @@ declare module "@mui/material/Chip" {
     gradient2: true;
   }
 }
+
+declare module "@mui/material/Typography" {
+  interface TypographyPropsColorOverrides {
+    tertiary: true;
+    gradient1: true;
+    gradient2: true;
+  }
+}
+
+declare module "@mui/material/Icon" {
+  interface IconPropsColorOverrides {
+    tertiary: true;
+    gradient1: true;
+    gradient2: true;
+  }
+}
+
+declare module "@mui/material/SvgIcon" {
+  interface SvgIconPropsColorOverrides {
+    tertiary: true;
+    gradient1: true;
+    gradient2: true;
+  }
+}
+
+declare module "@mui/material/Badge" {
+  interface BadgePropsColorOverrides {
+    tertiary: true;
+    gradient1: true;
+    gradient2: true;
+  }
+}
+
+export type PaletteColorKey =
+  | "primary"
+  | "secondary"
+  | "tertiary"
+  | "gradient1"
+  | "gradient2"
+  | "error"
+  | "warning"
+  | "info"
+  | "success";

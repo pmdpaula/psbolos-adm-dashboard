@@ -13,37 +13,14 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 
+import { SimpleDataText } from "@/components/text/DataTextPresenter";
 import type { ProjectFullDataDto } from "@/data/dto/project-dto";
 
-interface ProjectResumeProps {
+interface ProjectSummaryProps {
   projectFullData: ProjectFullDataDto;
 }
 
-interface DataTextProps {
-  description: string;
-  value: string | number;
-}
-
-const DataText = ({ description, value }: DataTextProps) => {
-  return (
-    <Typography
-      variant="body2"
-      gutterBottom
-      color="textSecondary"
-    >
-      {description}
-      <Typography
-        fontWeight="bold"
-        component="span"
-        color="textPrimary"
-      >
-        {value}
-      </Typography>
-    </Typography>
-  );
-};
-
-export const ProjectResume = ({ projectFullData }: ProjectResumeProps) => {
+export const ProjectSummary = ({ projectFullData }: ProjectSummaryProps) => {
   const [open, setOpen] = useState(false);
 
   function handleToggle() {
@@ -157,29 +134,29 @@ export const ProjectResume = ({ projectFullData }: ProjectResumeProps) => {
 
           <DialogContent dividers>
             {/* Dados base do projeto */}
-            <DataText
+            <SimpleDataText
               description="Descrição: "
               value={projectFullData.description || "Sem descrição."}
             />
 
-            <DataText
+            <SimpleDataText
               description="Data do evento: "
               value={new Date(projectFullData.eventDate).toLocaleDateString(
                 "pt-BR",
               )}
             />
 
-            <DataText
+            <SimpleDataText
               description="Status: "
               value={projectFullData.status.name}
             />
 
-            <DataText
+            <SimpleDataText
               description="Modo de entrega: "
               value={projectFullData.deliveryMode.name}
             />
 
-            <DataText
+            <SimpleDataText
               description="Local: "
               value={projectFullData.localName || "Não informado"}
             />
@@ -188,7 +165,7 @@ export const ProjectResume = ({ projectFullData }: ProjectResumeProps) => {
             <Divider />
             <Typography color="primary">Colaboradores</Typography>
             {getContractors().collaborators.length > 0 ? (
-              <DataText
+              <SimpleDataText
                 description={`${getContractors().type}: `}
                 value={getContractors().collaborators.join(", ")}
               />
@@ -203,7 +180,7 @@ export const ProjectResume = ({ projectFullData }: ProjectResumeProps) => {
             )}
 
             {getPlanners().collaborators.length > 0 ? (
-              <DataText
+              <SimpleDataText
                 description={`${getPlanners().type}: `}
                 value={getPlanners().collaborators.join(", ")}
               />
@@ -227,7 +204,7 @@ export const ProjectResume = ({ projectFullData }: ProjectResumeProps) => {
               spacing={2}
               mb={2}
             >
-              <DataText
+              <SimpleDataText
                 description="Bolos: "
                 value={costsOfProject().cakesCost.toLocaleString("pt-BR", {
                   currency: "BRL",
@@ -238,7 +215,7 @@ export const ProjectResume = ({ projectFullData }: ProjectResumeProps) => {
                 })}
               />
 
-              <DataText
+              <SimpleDataText
                 description="Frete: "
                 value={costsOfProject().shippingCost.toLocaleString("pt-BR", {
                   currency: "BRL",
@@ -249,7 +226,7 @@ export const ProjectResume = ({ projectFullData }: ProjectResumeProps) => {
                 })}
               />
 
-              <DataText
+              <SimpleDataText
                 description="Total: "
                 value={costsOfProject().totalCost.toLocaleString("pt-BR", {
                   currency: "BRL",

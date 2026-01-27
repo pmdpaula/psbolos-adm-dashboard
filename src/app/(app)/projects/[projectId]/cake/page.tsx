@@ -3,6 +3,7 @@
 import { Alert, Box, Snackbar, type SnackbarCloseReason } from "@mui/material";
 import { use, useEffect, useState } from "react";
 
+import { useMainContext } from "@/app/MainContext";
 import type { ProjectDto } from "@/data/dto/project-dto";
 import { getProjectById } from "@/http/project/get-project-by-id";
 
@@ -20,8 +21,8 @@ const CakeInProjectPage = ({ params }: CakeInProjectPageProps) => {
   const [isReadingData, setIsReadingData] = useState(true);
   const [project, setProject] = useState<ProjectDto | null>(null);
 
-  const { openAlertSnackBar, setOpenAlertSnackBar, refreshKey } =
-    useProjectContext();
+  const { refreshKey } = useProjectContext();
+  const { openAlertSnackBar, setOpenAlertSnackBar } = useMainContext();
 
   useEffect(() => {
     const checkAvaibilityOfAProject = async () => {

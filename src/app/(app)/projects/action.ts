@@ -5,6 +5,7 @@ import { HTTPError } from "ky";
 import type { ProjectDto } from "@/data/dto/project-dto";
 import { deleteProject } from "@/http/project/delete-project";
 import { editProject } from "@/http/project/edit-project";
+import { getProjectFullDataById } from "@/http/project/get-project-full-data-by-id";
 
 export async function editProjectAction(data: ProjectDto) {
   const {
@@ -83,4 +84,10 @@ export async function deleteProjectAction(id: string) {
     message: "Projeto deletado com sucesso!",
     errors: null,
   };
+}
+
+export async function getProjectFullDataByIdAction(id: string) {
+  const projectFullData = await getProjectFullDataById({ id });
+
+  return projectFullData;
 }

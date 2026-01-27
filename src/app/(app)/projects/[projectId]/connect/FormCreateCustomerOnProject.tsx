@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
 import { createCustomerAction } from "@/app/(app)/customer/action";
+import { useMainContext } from "@/app/MainContext";
 import { StyledFormHelperText } from "@/components/form-fields/StyledFormHelperText";
 import { StyledOutlinedInput } from "@/components/form-fields/StyledOutlinedInput";
 import type { CustomerDto } from "@/data/dto/customer-dto";
@@ -30,8 +31,8 @@ import {
 import { useProjectContext } from "../../ProjectContext";
 
 export const FormCreateCustomerOnProject = () => {
-  const { setOpenAlertSnackBar, setRefreshKey, setOpenForm } =
-    useProjectContext();
+  const { setOpenAlertSnackBar } = useMainContext();
+  const { setRefreshKey, setOpenForm } = useProjectContext();
 
   const {
     control,
@@ -56,6 +57,7 @@ export const FormCreateCustomerOnProject = () => {
     resolver: zodResolver(customerDtoSchema),
     mode: "all", // Valida onChange + onBlur
   });
+
   const [contactType1, contactType2] = watch(["contactType1", "contactType2"]);
 
   function handleChangeContactType1(event: SelectChangeEvent<string>) {

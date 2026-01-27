@@ -1,18 +1,14 @@
-"use client";
-
-import { Stack, Typography, useTheme } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 import Link from "next/link";
 
 import GlassCardHover from "@/components/glass/GlassCardHover";
 
 const HomePage = () => {
-  const theme = useTheme();
-
   return (
     <Stack spacing={2}>
       <Link href="/form-contract">
         <GlassCardHover
-          color={theme.palette.primary.main}
+          color="primary"
           sx={{
             textAlign: "center",
           }}
@@ -29,7 +25,7 @@ const HomePage = () => {
 
       <Link href="/customer">
         <GlassCardHover
-          color={theme.palette.primary.main}
+          color="primary"
           sx={{
             textAlign: "center",
           }}
@@ -46,7 +42,7 @@ const HomePage = () => {
 
       <Link href="/projects">
         <GlassCardHover
-          color={theme.palette.primary.main}
+          color="primary"
           sx={{
             textAlign: "center",
           }}

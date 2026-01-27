@@ -21,6 +21,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import { useEffect, useState } from "react";
 
+import { useMainContext } from "@/app/MainContext";
 import { GradientPaper } from "@/components/GradientPaper";
 import { StyledSwitch } from "@/components/StyledSwitch";
 import type { PaymentDto } from "@/data/dto/payment-dto";
@@ -37,7 +38,8 @@ export const PaymentsInProjectList = ({
   projectId,
 }: PaymentsInProjectListProps) => {
   const isBreakpointMinusMd = useMediaQuery(theme.breakpoints.down("sm"));
-  const { setOpenAlertSnackBar, setRefreshKey } = useProjectContext();
+  const { setOpenAlertSnackBar } = useMainContext();
+  const { setRefreshKey } = useProjectContext();
 
   const [payments, setPayments] = useState<PaymentDto[]>([]);
 

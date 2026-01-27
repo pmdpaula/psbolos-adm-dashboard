@@ -3,7 +3,6 @@
 import { createContext, useContext, useState } from "react";
 
 import type { ProjectDto } from "@/data/dto/project-dto";
-import type { AlertType } from "@/lib/alert";
 
 export type ProjectContextType = {
   refreshKey: number;
@@ -13,8 +12,6 @@ export type ProjectContextType = {
   setProjectContext: React.Dispatch<React.SetStateAction<ProjectDto | null>>;
   openForm: boolean;
   setOpenForm: React.Dispatch<React.SetStateAction<boolean>>;
-  openAlertSnackBar: AlertType;
-  setOpenAlertSnackBar: (alert: AlertType) => void;
   lastStepCompleted?: number;
   setLastStepCompleted?: (step: number) => void;
 };
@@ -32,13 +29,6 @@ export const ProjectProvider = ({ children }: ProjectProviderProps) => {
   const [openForm, setOpenForm] = useState<boolean>(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const [openAlertSnackBar, setOpenAlertSnackBar] = useState<AlertType>({
-    isOpen: false,
-    success: true,
-    message: "",
-    errorCode: null,
-  });
-
   const contextDefinitions: ProjectContextType = {
     refreshKey,
     setRefreshKey,
@@ -46,8 +36,6 @@ export const ProjectProvider = ({ children }: ProjectProviderProps) => {
     setOpenForm,
     projectContext,
     setProjectContext,
-    openAlertSnackBar,
-    setOpenAlertSnackBar,
   };
 
   return (

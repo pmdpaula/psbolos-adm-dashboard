@@ -1,28 +1,33 @@
 "use client";
 
-import { Paper } from "@mui/material";
+import Button from "@mui/material/Button";
 import { type PaletteColor, styled, useTheme } from "@mui/material/styles";
 import React from "react";
 
 import type { PaletteColorKey } from "@/theme/baseTheme";
 
 // Criamos o componente estilizado que recebe a cor como prop
-const StyledProPaper = styled(Paper, {
+const StyledProButton = styled(Button, {
   shouldForwardProp: (prop) => prop !== "color",
 })(({ theme, color }) => ({
   position: "relative",
-  margin: theme.spacing(2),
-  padding: theme.spacing(3),
-  borderRadius: 16,
+  padding: theme.spacing(4),
+  borderRadius: theme.spacing(2),
   backgroundColor: "#0a1010", // Fundo escuro base
-  backgroundImage: `radial-gradient(circle at 50% -20%, ${color}77 0%, transparent 70%)`,
-  border: `1px solid ${color}99`,
+  backgroundImage: `radial-gradient(circle at 50% -20%, ${color}44 0%, transparent 80%)`,
+  border: `1px solid ${color}22`,
+  color: theme.palette.getContrastText(color!),
   overflow: "hidden",
-  // boxShadow: `0 20px 40px rgba(0,0,0,0.8), 0 0 20px ${color}11`,
-  boxShadow: `0 0 20px ${color}55, 0 0 5px ${color}11`,
+  boxShadow: `0 20px 40px rgba(0,0,0,0.4), 0 0 20px ${color}11`,
   transition: "all 0.3s ease-in-out",
-  cursor: "pointer",
   backdropFilter: "blur(5px)",
+
+  "&:hover": {
+    backgroundImage: `radial-gradient(circle at 50% -20%, ${color}88 0%, transparent 80%)`,
+    border: `1px solid ${color}66`,
+    boxShadow: `0 25px 50px rgba(0,0,0,0.5), 0 0 30px ${color}33`,
+    transform: "translateY(-1px)",
+  },
 
   // Efeito de brilho na borda superior (opcional para dar mais realismo)
   "&::before": {
@@ -35,41 +40,38 @@ const StyledProPaper = styled(Paper, {
     height: "1px",
     background: `linear-gradient(90deg, transparent, ${color}, transparent)`,
     opacity: 0.5,
+    transition: "opacity 0.3s ease-in-out",
   },
 
-  // Efeito hover com zoom e aumento de sombra
-  "&:hover": {
-    transform: "scale(1.01)",
-    // boxShadow: `0 30px 60px rgba(0,0,0,0.6), 0 0 30px ${color}30`,
-    boxShadow: `0 0 30px ${color}66, 0 0 5px ${color}11`,
+  "&:hover::before": {
+    opacity: 0.8,
   },
 }));
 
-interface GlassCardHoverProps extends React.ComponentProps<typeof Paper> {
+interface GlassButtonProps extends React.ComponentProps<typeof Button> {
   color?: PaletteColorKey;
-  children?: React.ReactNode;
+  children: React.ReactNode;
 }
 
-const GlassCardHover = ({
+const GlassButton = ({
   color = "primary",
   children,
   ...props
-}: GlassCardHoverProps) => {
+}: GlassButtonProps) => {
   const theme = useTheme();
 
   const paletteColor = theme.palette[color] as PaletteColor;
   color = paletteColor.main as PaletteColorKey;
 
   return (
-    <StyledProPaper
+    <StyledProButton
       color={color}
-      elevation={0}
       {...props}
       sx={{ ...props.sx }}
     >
       {children}
-    </StyledProPaper>
+    </StyledProButton>
   );
 };
 
-export default GlassCardHover;
+export default GlassButton;

@@ -11,22 +11,23 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Snackbar,
-  type SnackbarCloseReason,
   Stack,
   TextField,
   Typography,
   useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Controller, type SubmitHandler, useForm } from "react-hook-form";
 
+import { useMainContext } from "@/app/MainContext";
 import { StyledFormHelperText } from "@/components/form-fields/StyledFormHelperText";
 import FullScreenDialog from "@/components/FullScreenDialog";
 import GlassCardHover from "@/components/glass/GlassCardHover";
 import { GradientPaper } from "@/components/GradientPaper";
+import { MainContextSnackbar } from "@/components/MainContextSnackbar";
 import {
   type CollaborationForm,
   collaborationFormSchema,
@@ -36,13 +37,10 @@ import type { CustomerDto } from "@/data/dto/customer-dto";
 import { getCustomers } from "@/http/customer/get-customers";
 import { getCollaboratorTypes } from "@/http/data-types/get-collaborator-types";
 import { getProfile } from "@/http/user/get-profile";
-import theme from "@/theme/theme";
 
+import { getProjectFullDataByIdAction } from "../../action";
 import { useProjectContext } from "../../ProjectContext";
-import {
-  createCollaborationAction,
-  getProjectFullDataByIdAction,
-} from "./actions";
+import { createCollaborationAction } from "./actions";
 import { AlreadyConnectedCustomers } from "./AlreadyConnectedCustomers";
 import { FormCreateCustomerOnProject } from "./FormCreateCustomerOnProject";
 
@@ -75,31 +73,35 @@ export const fetchCollaborationsInProject = async (projectId: string) => {
     }),
   );
 
-  return collaborationsInProject;
+  const collaborationsInProjectSorted = collaborationsInProject.sort((a, b) =>
+    a.collaboratorType.name.localeCompare(b.collaboratorType.name),
+  );
+
+  return collaborationsInProjectSorted;
 };
 
 export const FormConnectCollaborator = ({
   projectId,
 }: FormConnectCollaboratorProps) => {
+  const { setOpenAlertSnackBar } = useMainContext();
+  const theme = useTheme();
   const isBreakpointMinusMd = useMediaQuery(theme.breakpoints.down("sm"));
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const {
-    openAlertSnackBar,
-    setOpenAlertSnackBar,
-    openForm,
-    setOpenForm,
-    refreshKey,
-    setRefreshKey,
-  } = useProjectContext();
+  const { openForm, setOpenForm, refreshKey, setRefreshKey } =
+    useProjectContext();
   const [isReadingData, setIsReadingData] = useState(true);
 
   const [customersOutsideProject, setCustomersOutsideProject] = useState<
     CustomerDto[]
   >([]);
 
+  const [contractorTypeName, setContractorTypeName] = useState<string>("");
+
   const [collaborations, setCollaborations] = useState<CollaborationFull[]>([]);
+  const [isThereContractorInProject, setIsThereContractorInProject] =
+    useState(false);
 
   const { data: collaboratorTypesData, isLoading: isLoadingCollaboratorTypes } =
     useQuery({
@@ -118,6 +120,14 @@ export const FormConnectCollaborator = ({
   });
 
   useEffect(() => {
+    if (collaboratorTypesData && !isLoadingCollaboratorTypes) {
+      setContractorTypeName(
+        collaboratorTypesData.collaboratorTypes.find(
+          (type) => type.code === "CONTRACTOR",
+        )!.name,
+      );
+    }
+
     setIsReadingData(isLoadingCollaboratorTypes || isLoadingUserProfile);
   }, [isLoadingCollaboratorTypes, isLoadingUserProfile]);
 
@@ -148,6 +158,18 @@ export const FormConnectCollaborator = ({
     setIsReadingData(false);
   }
 
+  function findContractorCollaborator(collabs: CollaborationFull[]): boolean {
+    if (collabs.length === 0) {
+      return false;
+    }
+
+    const contractorCollaborations = collabs.filter(
+      (collab) => collab.collaboratorType.code === "CONTRACTOR",
+    );
+
+    return contractorCollaborations.length > 0;
+  }
+
   useEffect(() => {
     if (!openForm) {
       // Refresh react-query data so Autocomplete gets the latest customers
@@ -164,15 +186,18 @@ export const FormConnectCollaborator = ({
     filterCustomersOutsideProject();
   }, [customersData, refreshKey]);
 
+  useEffect(() => {
+    setIsThereContractorInProject(findContractorCollaborator(collaborations));
+  }, [collaborations]);
+
   const {
     control,
     handleSubmit,
-    // watch,
     formState: { errors, isValid },
   } = useForm<CollaborationForm>({
     defaultValues: {
       customerId: "",
-      collaboratorTypeCode: "CONTRACTOR",
+      collaboratorTypeCode: "CUSTOMER",
     },
     resolver: zodResolver(collaborationFormSchema),
   });
@@ -199,25 +224,6 @@ export const FormConnectCollaborator = ({
     }
   };
 
-  function handleCloseAlert(
-    event?: React.SyntheticEvent | Event,
-    reason?: SnackbarCloseReason,
-  ) {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setOpenAlertSnackBar({
-      isOpen: false,
-      success: true,
-      message: "",
-      errorCode: null,
-    });
-
-    // router.refresh();
-    // router.push("/projects/connect");
-  }
-
   function setFocusOnCustomerSelect() {
     const customerSelect = document.getElementById("customerId");
 
@@ -238,20 +244,27 @@ export const FormConnectCollaborator = ({
       <GradientPaper style={{ marginTop: 16, padding: 16 }}>
         {!isReadingData && (
           <>
-            <Typography
+            {/* <Typography
               variant="body1"
               sx={{ my: 2 }}
             >
               Temos {customersData ? customersData.customers.length : 0}{" "}
               colaboradores cadastrados
-            </Typography>
+            </Typography> */}
+
+            {isThereContractorInProject && (
+              <Alert
+                severity="info"
+                sx={{ mb: 2 }}
+              >
+                {`Já existe um ${contractorTypeName.toLocaleLowerCase()} conectado a este
+                  projeto. Somente um por projeto.`}
+              </Alert>
+            )}
 
             <form
               onSubmit={handleSubmit(onSubmit)}
               key={refreshKey}
-              // style={{
-              //   width: "100%",
-              // }}
             >
               <Stack
                 spacing={2}
@@ -390,14 +403,19 @@ export const FormConnectCollaborator = ({
                           >
                             {collaboratorTypesData?.collaboratorTypes.map(
                               (mode) => {
-                                return (
-                                  <MenuItem
-                                    key={mode.code}
-                                    value={mode.code}
-                                  >
-                                    {mode.name}
-                                  </MenuItem>
-                                );
+                                if (
+                                  !isThereContractorInProject ||
+                                  mode.code !== "CONTRACTOR"
+                                ) {
+                                  return (
+                                    <MenuItem
+                                      key={mode.code}
+                                      value={mode.code}
+                                    >
+                                      {mode.name}
+                                    </MenuItem>
+                                  );
+                                }
                               },
                             )}
                           </Select>
@@ -464,30 +482,7 @@ export const FormConnectCollaborator = ({
         <FormCreateCustomerOnProject />
       </FullScreenDialog>
 
-      <Snackbar
-        open={openAlertSnackBar.isOpen}
-        autoHideDuration={5000}
-        onClose={handleCloseAlert}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        {openAlertSnackBar.success ? (
-          <Alert
-            onClose={handleCloseAlert}
-            severity="success"
-            sx={{ textAlign: "right" }}
-          >
-            {openAlertSnackBar.message}
-          </Alert>
-        ) : (
-          <Alert
-            onClose={handleCloseAlert}
-            severity="error"
-            sx={{ textAlign: "right" }}
-          >
-            {openAlertSnackBar.message}
-          </Alert>
-        )}
-      </Snackbar>
+      <MainContextSnackbar />
     </>
   );
 };

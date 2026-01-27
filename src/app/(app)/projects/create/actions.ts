@@ -4,7 +4,6 @@ import { HTTPError } from "ky";
 
 import type { CreateProjectDto } from "@/data/dto/project-dto";
 import { createProject } from "@/http/project/create-project";
-import { getProjectById } from "@/http/project/get-project-by-id";
 import { getProjectByName } from "@/http/project/get-project-by-name";
 
 export async function createProjectAction(data: CreateProjectDto) {
@@ -59,12 +58,6 @@ export async function createProjectAction(data: CreateProjectDto) {
     message: "Projeto criado com sucesso!",
     errors: null,
   };
-}
-
-export async function getProjectByIdAction(id: string) {
-  const project = await getProjectById({ id });
-
-  return project;
 }
 
 export async function getProjectByNameAction(name: string) {
