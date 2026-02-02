@@ -12,8 +12,8 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { useRouter } from "next/navigation";
 
+// import { useRouter } from "next/navigation";
 import GlassCard from "@/components/glass/GlassCard";
 import {
   defineDetailsForProjectStatus,
@@ -34,10 +34,10 @@ type ProjectsByStatus = {
 
 export const ProjectsList = ({
   projects,
-  projectStatuses,
+  // projectStatuses,
 }: ProjectsListProps) => {
   const theme = useTheme();
-  const router = useRouter();
+  // const router = useRouter();
 
   const projectsByStatus: ProjectsByStatus = {
     working: projects.filter((project) =>
