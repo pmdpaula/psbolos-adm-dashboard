@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
+import { env } from "@/env";
 // import { acceptInvite } from "@/http/accept-invite";
 import { signInWithGitHub } from "@/http/auth/sign-in-with-github";
 
@@ -32,9 +33,9 @@ export async function GET(request: NextRequest) {
   //   } catch {}
   // }
 
-  const redirectUrl = request.nextUrl.clone();
-  redirectUrl.pathname = "/";
-  redirectUrl.search = "";
+  // Use NEXT_PUBLIC_APP_URL if available, otherwise fallback to request origin
+  const baseUrl = env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin;
+  const redirectUrl = new URL("/", baseUrl);
 
   return NextResponse.redirect(redirectUrl);
 }
