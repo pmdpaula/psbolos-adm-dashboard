@@ -25,13 +25,10 @@ export async function addPaymentToProjectAction(payment: CreatePaymentDto) {
     });
   } catch (error) {
     if (error instanceof HTTPError) {
-      console.log("🚀 ~ addPaymentToProjectAction ~ HTTPError:", error);
       const { message } = await error.response.json();
 
       return { success: false, message, errors: error.response.status };
     }
-
-    console.log("🚀 ~ addPaymentToProjectAction ~ error:", error);
 
     return {
       success: false,
@@ -51,18 +48,14 @@ export async function removePaymentAction(
   projectId: string,
   paymentId: string,
 ): Promise<{ success: boolean; message: string; errors: null | number }> {
-  console.log("🚀 ~ removePaymentAction ~ paymentId:", paymentId);
   try {
     await deletePayment(projectId, paymentId);
   } catch (error) {
     if (error instanceof HTTPError) {
-      console.log("🚀 ~ removePaymentAction ~ HTTPError:", error);
       const { message } = await error.response.json();
 
       return { success: false, message, errors: error.response.status };
     }
-
-    console.log("🚀 ~ removePaymentAction ~ error:", error);
 
     return {
       success: false,

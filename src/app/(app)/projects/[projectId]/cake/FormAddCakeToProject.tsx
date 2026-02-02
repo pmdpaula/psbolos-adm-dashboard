@@ -83,17 +83,6 @@ export const FormAddCakeToProject = ({
   const [isButtonDisabled, setIsButtonDisabled] = useState(isLoading);
   const [isReadingData, setIsReadingData] = useState(true);
 
-  // function handleChangeSelectField(event: SelectChangeEvent<string>) {
-  //   const { name, value } = event.target;
-  //   // console.log("🚀 ~ handleChangeSelectField ~ event.target:", event.target);
-
-  //   if (!value) {
-  //     setValue(name as keyof CreateCakeDto, "");
-  //   } else {
-  //     setValue(name as keyof CreateCakeDto, value);
-  //   }
-  // }
-
   useEffect(() => {
     setOpenAlertSnackBar({
       isOpen: false,

@@ -7,24 +7,35 @@ import { getProfile } from "@/http/user/get-profile";
 
 export async function isAuthenticated() {
   const cookieStore = await cookies();
-  const result = cookieStore.get("token")?.value;
+  const result = cookieStore.get("access_token")?.value;
   return !!result;
 }
 
 export async function checkAuthentication() {
   const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+  const accessToken = cookieStore.get("access_token")?.value;
+  const refreshToken = cookieStore.get("refresh_token")?.value;
 
-  if (!token) {
+  if (!accessToken) {
+    // Se não tem access token mas tem refresh token, redirecionar para refresh
+    if (refreshToken) {
+      redirect("/api/auth/refresh?redirect_to=/");
+    }
     redirect("/auth/sign-in");
   }
 
   try {
     const { user } = await getProfile();
     return { user };
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    // console.log("🚀 ~ auth ~ error:", error);
+    // Re-throw NEXT_REDIRECT errors - must check for digest property
+    if (error && typeof error === "object" && "digest" in error) {
+      throw error;
+    }
+    // Se tem refresh token, tentar refresh antes de sign-out
+    if (refreshToken) {
+      redirect("/api/auth/refresh?redirect_to=/");
+    }
     redirect("/api/auth/sign-out");
   }
 }

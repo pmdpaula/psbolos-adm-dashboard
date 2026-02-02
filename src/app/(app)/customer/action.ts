@@ -38,13 +38,10 @@ export async function createCustomerAction(data: CustomerDto) {
     });
   } catch (error) {
     if (error instanceof HTTPError) {
-      console.log("🚀 ~ createCustomerAction ~ HTTPError:", error);
       const { message } = await error.response.json();
 
       return { success: false, message, errors: error.response.status };
     }
-
-    console.log("🚀 ~ createCustomerAction ~ error:", error);
 
     return {
       success: false,

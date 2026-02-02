@@ -23,12 +23,12 @@ const ProjectPage = () => {
     queryFn: async () => await getProjects(),
   });
 
-  const { data: eventTypesData, isLoading: isLoadingEventTypes } = useQuery({
+  const { data: _eventTypesData, isLoading: isLoadingEventTypes } = useQuery({
     queryKey: ["event-types"],
     queryFn: async () => await getEventTypes(),
   });
 
-  const { data: deliveryModesData, isLoading: isLoadingDeliveryModes } =
+  const { data: _deliveryModesData, isLoading: isLoadingDeliveryModes } =
     useQuery({
       queryKey: ["delivery-modes"],
       queryFn: async () => await getDeliveryModes(),
