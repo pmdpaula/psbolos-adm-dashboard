@@ -1,7 +1,3 @@
-import { redirect } from "next/navigation";
-
-import { checkAuthentication } from "@/auth/auth";
-
 import { ProjectProvider } from "./ProjectContext";
 
 export default async function RootLayout({
@@ -9,11 +5,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { user } = await checkAuthentication();
+  // const { user } = await checkAuthentication();
 
-  if (user.userRole !== "ADMIN") {
-    redirect("/about");
-  }
+  // if (user.userRole !== "ADMIN") {
+  //   redirect("/about");
+  // }
 
   return <ProjectProvider>{children}</ProjectProvider>;
 }

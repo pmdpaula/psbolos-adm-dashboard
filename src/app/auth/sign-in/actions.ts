@@ -5,22 +5,38 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { type SignInFormData } from "@/data/dto/user-dto";
+import { env } from "@/env";
 import { signInWithPassword } from "@/http/auth/sign-in-with-password";
 
 export async function signInWithEmailAndPassword(data: SignInFormData) {
   const { email, password } = data;
 
   try {
-    const { access_token } = await signInWithPassword({
+    const {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      access_token_expires_in: accessTokenExpiresIn,
+      refresh_token_expires_at: refreshTokenExpiresAt,
+    } = await signInWithPassword({
       email,
       password,
     });
 
-    (await cookies()).set("token", access_token, {
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      // httpOnly: true,
-      // sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+    const cookieStore = await cookies();
+
+    cookieStore.set("access_token", accessToken, {
+      maxAge: accessTokenExpiresIn,
+      httpOnly: false,
+      sameSite: "lax",
+      secure: env.NODE_ENV === "production",
+      path: "/",
+    });
+
+    cookieStore.set("refresh_token", refreshToken, {
+      expires: new Date(refreshTokenExpiresAt),
+      httpOnly: true,
+      sameSite: "lax",
+      secure: env.NODE_ENV === "production",
       path: "/",
     });
   } catch (error) {

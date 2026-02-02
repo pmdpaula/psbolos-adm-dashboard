@@ -47,13 +47,10 @@ export async function createCollaborationAction(data: CollaborationDto) {
     });
   } catch (error) {
     if (error instanceof HTTPError) {
-      console.log("🚀 ~ createCollaborationAction ~ HTTPError:", error);
       const { message } = await error.response.json();
 
       return { success: false, message, errors: error.response.status };
     }
-
-    console.log("🚀 ~ createCollaborationAction ~ error:", error);
 
     return {
       success: false,
@@ -75,13 +72,10 @@ export async function disconnectCollaboratorAction(collaborationId: string) {
     await disconnectCollaborator(collaborationId);
   } catch (error) {
     if (error instanceof HTTPError) {
-      console.log("🚀 ~ disconnectCollaboratorAction ~ HTTPError:", error);
       const { message } = await error.response.json();
 
       return { success: false, message, errors: error.response.status };
     }
-
-    console.log("🚀 ~ disconnectCollaboratorAction ~ error:", error);
 
     return {
       success: false,

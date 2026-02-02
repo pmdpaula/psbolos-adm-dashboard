@@ -37,13 +37,10 @@ export async function createProjectAction(data: CreateProjectDto) {
     });
   } catch (error) {
     if (error instanceof HTTPError) {
-      console.log("🚀 ~ createProjectAction ~ HTTPError:", error);
       const { message } = await error.response.json();
 
       return { success: false, message, errors: error.response.status };
     }
-
-    console.log("🚀 ~ createProjectAction ~ error:", error);
 
     return {
       success: false,

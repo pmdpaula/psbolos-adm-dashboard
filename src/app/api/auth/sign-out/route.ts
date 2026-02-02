@@ -13,10 +13,16 @@ export async function GET(request: NextRequest) {
   try {
     await apiClient.post("users/sessions/sign-out");
   } catch (error) {
-    console.error("Error signing out from backend:", error);
+    if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
+      // Ignore redirect errors from api-client (e.g. failed refresh during sign-out)
+      // We are already signing out, so we can proceed.
+    } else {
+      console.error("Error signing out from backend:", error);
+    }
   }
 
-  cookiesStore.delete("token");
+  cookiesStore.delete("access_token");
+  cookiesStore.delete("refresh_token");
 
   return NextResponse.redirect(redirectUrl);
 }

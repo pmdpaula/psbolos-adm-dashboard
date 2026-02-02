@@ -31,13 +31,10 @@ export async function addCakeToProjectAction(cake: CreateCakeDto) {
     });
   } catch (error) {
     if (error instanceof HTTPError) {
-      console.log("🚀 ~ createCakeAction ~ HTTPError:", error);
       const { message } = await error.response.json();
 
       return { success: false, message, errors: error.response.status };
     }
-
-    console.log("🚀 ~ createCakeAction ~ error:", error);
 
     return {
       success: false,
@@ -61,13 +58,10 @@ export async function removeCakeAction(
     await deleteCake(projectId, cakeId);
   } catch (error) {
     if (error instanceof HTTPError) {
-      console.log("🚀 ~ removeCakeAction ~ HTTPError:", error);
       const { message } = await error.response.json();
 
       return { success: false, message, errors: error.response.status };
     }
-
-    console.log("🚀 ~ removeCakeAction ~ error:", error);
 
     return {
       success: false,

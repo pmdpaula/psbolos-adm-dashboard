@@ -16,11 +16,14 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Controller, type SubmitHandler, useForm } from "react-hook-form";
 
+import googleIcon from "@/assets/google-logo-color.svg";
 import { type SignInFormData, signInSchema } from "@/data/dto/user-dto";
+import { signInWithGoogle } from "@/http/auth/sign-in-with-google";
 import type { AlertType } from "@/lib/alert";
 
 import { signInWithEmailAndPassword } from "./actions";
@@ -218,13 +221,17 @@ export const SignInForm = () => {
         </Stack>
       </form>
 
-      {/* <SignInGoogle /> */}
-      {/* <form action={signInWithGoogle}>
-          <Button type="submit" variant="outlined" className="w-full">
-            <Image src={googleIcon} alt="Google" height={24} />
-            <span style={{ marginLeft: 8 }}>Acessar com Google</span>
-          </Button>
-        </form> */}
+      <Button
+        type="button"
+        variant="outlined"
+        fullWidth
+        size="large"
+        sx={{ mt: 2, height: 42 }}
+        onClick={() => signInWithGoogle()}
+      >
+        <Image src={googleIcon} alt="Google" height={24} width={24} />
+        <span style={{ marginLeft: 8 }}>Acessar com Google</span>
+      </Button>
 
       <Snackbar
         open={openAlert.isOpen}

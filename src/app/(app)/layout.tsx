@@ -10,6 +10,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const { user } = await checkAuthentication();
+  // const { user } = await getProfile();
 
   if (user.userRole !== "ADMIN") {
     redirect("/about");
@@ -21,8 +22,7 @@ export default async function RootLayout({
 
       <Container
         maxWidth="md"
-        // disableGutters
-        sx={{ paddingY: 3 }}
+        sx={{ py: 3 }}
       >
         {children}
       </Container>
