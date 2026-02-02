@@ -41,6 +41,7 @@ export const apiClient = ky.create({
           } else {
             // Server-side: throw error to be handled by caller (e.g., checkAuthentication)
             const error = new Error("Unauthorized - Token expired");
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (error as any).status = 401;
             throw error;
           }
