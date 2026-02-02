@@ -77,9 +77,9 @@ export async function GET(request: NextRequest) {
     sameSite: "lax",
   });
 
-  const redirectUrl = request.nextUrl.clone();
-  redirectUrl.pathname = "/";
-  redirectUrl.search = "";
+  // Use NEXT_PUBLIC_APP_URL if available, otherwise fallback to request origin
+  const baseUrl = env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin;
+  const redirectUrl = new URL("/", baseUrl);
 
   return NextResponse.redirect(redirectUrl);
 }
