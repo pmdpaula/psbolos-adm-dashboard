@@ -44,6 +44,8 @@ import { createCollaborationAction } from "./actions";
 import { AlreadyConnectedCustomers } from "./AlreadyConnectedCustomers";
 import { FormCreateCustomerOnProject } from "./FormCreateCustomerOnProject";
 
+// TODO: Adicionar um alerta caso o projeto ainda não tenha um contratante conectado. Informar que só é possível criar o contrato com um contratante conectado ao projeto.
+
 interface AutocompleteOption {
   label: string;
   id: string;

@@ -18,6 +18,10 @@ import { ProjectHeader } from "../../components/ProjectHeader";
 import { ProjectSummary } from "../../components/ProjectSummary";
 import { ManageProjectOptions } from "./ManageProjectOptions";
 
+// TODO: Adicionar no resumo os pagamentos feitos.
+// TODO: Adicionar alguma informação caso o pagamento esteja quitado.
+// TODO: Adicionar alguma informação caso o projeto esteja atrasado, isto é, a data do evento é em menos de 7 dias e o projeto não foi quitado.
+
 interface ManageProjectPageProps {
   params: Promise<{ projectId: string }>;
 }

@@ -21,6 +21,9 @@ import type { ProjectDto } from "@/data/dto/project-dto";
 import { FormProject } from "../../FormProject";
 import { getProjectByIdAction } from "../actions";
 
+// TODO: Adicionar o header padrão dos projetos
+// TODO: Remover o botão de gerar contrato
+
 interface EditProjectPageProps {
   params: Promise<{ projectId: string }>;
 }
