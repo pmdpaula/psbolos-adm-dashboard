@@ -18,6 +18,8 @@ export const headerSchema = z.object({
   title: z.string().min(1).max(20).nullable().optional(),
 });
 
+// TODO: Ajustar altura para que não haja diferença entre antes e depois de ler os dados
+
 type HeaderProps = z.infer<typeof headerSchema>;
 
 // interface HeaderProps {
