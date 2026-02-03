@@ -5,15 +5,16 @@ import {
   alpha,
   Box,
   Chip,
-  Divider,
   Grid,
   Icon,
   ListItem,
   Typography,
+  useMediaQuery,
   useTheme,
 } from "@mui/material";
+import Link from "next/link";
 
-// import { useRouter } from "next/navigation";
+import { ChipIcon } from "@/components/glass/ChipIcon";
 import GlassCard from "@/components/glass/GlassCard";
 import {
   defineDetailsForProjectStatus,
@@ -37,28 +38,32 @@ export const ProjectsList = ({
   // projectStatuses,
 }: ProjectsListProps) => {
   const theme = useTheme();
-  // const router = useRouter();
+  const isBreakpointMinusMd = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const orderedProject = projects.sort((a, b) =>
+    a.eventDate.localeCompare(b.eventDate),
+  );
 
   const projectsByStatus: ProjectsByStatus = {
-    working: projects.filter((project) =>
+    working: orderedProject.filter((project) =>
       projectStatusDefinition[0].options.includes(
         project.statusCode as ProjectTypes,
       ),
     ),
 
-    planning: projects.filter((project) =>
+    planning: orderedProject.filter((project) =>
       projectStatusDefinition[1].options.includes(
         project.statusCode as ProjectTypes,
       ),
     ),
 
-    completed: projects.filter((project) =>
+    completed: orderedProject.filter((project) =>
       projectStatusDefinition[2].options.includes(
         project.statusCode as ProjectTypes,
       ),
     ),
 
-    cancelled: projects.filter((project) =>
+    cancelled: orderedProject.filter((project) =>
       projectStatusDefinition[3].options.includes(
         project.statusCode as ProjectTypes,
       ),
@@ -66,16 +71,7 @@ export const ProjectsList = ({
   };
 
   return (
-    <GlassCard>
-      <Typography
-        variant="h5"
-        fontWeight="bold"
-      >
-        Lista de Projetos
-      </Typography>
-
-      <Divider sx={{ my: 1 }} />
-
+    <GlassCard sx={{ padding: 2 }}>
       {Object.keys(projectsByStatus).map((statusKey) => (
         <Box
           key={statusKey}
@@ -108,55 +104,15 @@ export const ProjectsList = ({
               }}
             >
               <ListItem disablePadding>
-                <GlassCard
-                  sx={{
-                    paddingY: 0.5,
-                    paddingLeft: 5,
-                    paddingRight: 1.5,
-                    display: "flex",
-                    alignItems: "center",
-                    overflow: "visible",
-                  }}
+                <ChipIcon
+                  text={
+                    projectStatusDefinition.find(
+                      (def) => def.code.toLowerCase() === statusKey,
+                    )?.name || ""
+                  }
+                  icon={defineDetailsForProjectStatus(statusKey).icon}
                   color={defineDetailsForProjectStatus(statusKey).color}
-                >
-                  <Box
-                    color={defineDetailsForProjectStatus(statusKey).color}
-                    sx={{
-                      position: "absolute",
-                      left: -6,
-                      padding: 2,
-                      minWidth: "auto",
-                      width: 10,
-                      height: 10,
-                      borderRadius: "calc(50% + 4px)",
-                      backdropFilter: "blur(3px)",
-                      backgroundColor: alpha(
-                        theme.palette[
-                          defineDetailsForProjectStatus(statusKey).color
-                        ].main,
-                        0.3,
-                      ),
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Icon fontSize="small">
-                      {defineDetailsForProjectStatus(statusKey).icon}
-                    </Icon>
-                  </Box>
-
-                  <Typography
-                    variant="body1"
-                    sx={{ fontWeight: "bold" }}
-                  >
-                    {
-                      projectStatusDefinition.find(
-                        (def) => def.code.toLowerCase() === statusKey,
-                      )?.name
-                    }
-                  </Typography>
-                </GlassCard>
+                />
 
                 <Chip
                   label={projectsByStatus[statusKey].length}
@@ -174,50 +130,55 @@ export const ProjectsList = ({
             <AccordionDetails>
               {projectsByStatus[statusKey].map((project) => (
                 <ListItem
-                  // onClick={() => {
-                  //   router.push(`/projects/${project.id}/manage`);
-                  // }}
                   key={project.id}
-                  sx={{ paddingY: 1 }}
+                  sx={{
+                    paddingY: 1,
+                    paddingX: 0,
+                    width: "100%",
+                  }}
                   divider
                 >
                   <Grid
                     container
-                    // justifyContent="flex-start"
-                    // alignItems=""
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
                     spacing={1}
+                    sx={{ width: "100%" }}
                   >
-                    <Grid
-                      size={6}
-                      component={Box}
-                      display="flex"
-                      alignItems="center"
-                    >
-                      <Icon
-                        sx={{ marginRight: 2, color: "info.main" }}
-                        fontSize="small"
-                      >
-                        folder_open
-                      </Icon>
-
+                    <Link href={`/projects/${project.id}/manage`}>
                       <Typography
                         variant="body1"
                         color="info"
-                        sx={{ fontWeight: "bold", marginRight: 2 }}
+                        sx={{
+                          fontWeight: "bold",
+                          minWidth: 120,
+                        }}
                       >
                         {project.name}
                       </Typography>
-                    </Grid>
+                    </Link>
+
+                    {!isBreakpointMinusMd && (
+                      <Typography
+                        variant="body2"
+                        color="textSecondary"
+                      >
+                        {project.description}
+                      </Typography>
+                    )}
+
+                    <Chip
+                      label={new Date(project.eventDate).toLocaleDateString()}
+                      color={
+                        project.statusCode
+                          ? defineDetailsForProjectStatus(project.statusCode)
+                              .color
+                          : "default"
+                      }
+                      size="small"
+                    />
                   </Grid>
-
-                  <Typography
-                    variant="body2"
-                    // sx={{ fontWeight: "bold", marginRight: 2 }}
-                  >
-                    {project.description}
-                  </Typography>
-
-                  {/* <Divider /> */}
                 </ListItem>
               ))}
             </AccordionDetails>
