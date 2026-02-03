@@ -59,6 +59,7 @@ const GlassCardHover = ({
 
   const paletteColor = theme.palette[color] as PaletteColor;
   color = paletteColor.main as PaletteColorKey;
+  // color = paletteColor[theme.palette.mode] as PaletteColorKey;
 
   return (
     <StyledProPaper

@@ -14,7 +14,7 @@ import type { PaletteColorKey } from "@/theme/baseTheme";
 
 import GlassCardHover from "./GlassCardHover";
 
-export const GlassDialogBase = styled(Dialog)(({ theme }) => ({
+const GlassDialogBase = styled(Dialog)(({ theme }) => ({
   "& .MuiPaper-root": {
     color: theme.palette.text.primary,
   },
@@ -35,7 +35,7 @@ export const GlassDialog = ({
   const theme = useTheme();
 
   const paletteColor = theme.palette[color] as PaletteColor;
-  color = paletteColor.main as PaletteColorKey;
+  const transformedColor = paletteColor[theme.palette.mode] as PaletteColorKey;
 
   return (
     <GlassDialogBase
@@ -43,7 +43,7 @@ export const GlassDialog = ({
       PaperComponent={(props) => (
         <GlassCardHover
           {...props}
-          color={color}
+          color={color as PaletteColorKey}
           sx={{ padding: 2 }}
         />
       )}
@@ -55,8 +55,8 @@ export const GlassDialog = ({
           variant="h5"
           color={
             theme.palette.mode === "dark"
-              ? lighten(color, 0.3)
-              : darken(color, 0.8)
+              ? lighten(transformedColor, 0.3)
+              : darken(transformedColor, 0.8)
           }
         >
           {title}
