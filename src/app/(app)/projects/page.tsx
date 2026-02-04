@@ -105,7 +105,8 @@ const ProjectPage = () => {
       <Stack
         direction="row"
         justifyContent="space-between"
-        alignItems="flex-start"
+        alignItems="center"
+        mb={1}
       >
         <Typography
           variant="h4"
@@ -114,6 +115,16 @@ const ProjectPage = () => {
         >
           Projetos
         </Typography>
+
+        <Button
+          href="/projects/search"
+          variant="outlined"
+          disableRipple
+          disableElevation
+          sx={{ marginRight: 1 }}
+        >
+          Buscar Projetos
+        </Button>
 
         <Tooltip title="Adicionar Projeto">
           <Button

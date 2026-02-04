@@ -1,3 +1,5 @@
+"use client";
+
 import { alpha, OutlinedInput, styled } from "@mui/material";
 
 export const StyledOutlinedInput = styled(OutlinedInput, {

@@ -216,6 +216,17 @@ export const ProjectDataTable = ({
         rows={rows}
         columns={projectsColumns}
         loading={isReadingData}
+        density="compact"
+        sx={{
+          background: (theme) => theme.palette.gradient1[theme.palette.mode],
+          "& .MuiDataGrid-columnHeaderRow": {
+            bgcolor: "secondary",
+          },
+
+          "& .MuiDataGrid-row:hover": {
+            bgcolor: "tertiary",
+          },
+        }}
         initialState={{
           columns: {
             columnVisibilityModel: {
