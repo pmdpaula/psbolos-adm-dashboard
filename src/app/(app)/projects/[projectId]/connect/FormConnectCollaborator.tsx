@@ -33,16 +33,16 @@ import {
   collaborationFormSchema,
   type CollaborationFull,
 } from "@/data/dto/collaboration-dto";
-import type { CustomerDto } from "@/data/dto/customer-dto";
-import { getCustomers } from "@/http/customer/get-customers";
+import type { CollaboratorDto } from "@/data/dto/collaborator-dto";
+import { fetchCollaborators } from "@/http/collaborator/fetch-collaborators";
 import { getCollaboratorTypes } from "@/http/data-types/get-collaborator-types";
 import { getProfile } from "@/http/user/get-profile";
 
 import { getProjectFullDataByIdAction } from "../../action";
 import { useProjectContext } from "../../ProjectContext";
 import { createCollaborationAction } from "./actions";
-import { AlreadyConnectedCustomers } from "./AlreadyConnectedCustomers";
-import { FormCreateCustomerOnProject } from "./FormCreateCustomerOnProject";
+import { AlreadyConnectedCollaborators } from "./AlreadyConnectedCollaborators";
+import { FormCreateCollaboratorOnProject } from "./FormCreateCollaboratorOnProject";
 
 // TODO: Adicionar um alerta caso o projeto ainda não tenha um contratante conectado. Informar que só é possível criar o contrato com um contratante conectado ao projeto.
 
@@ -69,7 +69,6 @@ export const fetchCollaborationsInProject = async (projectId: string) => {
       collaboratorType: collaboration.collaboratorType,
       projectId,
       collaborationId: collaboration.id,
-      // userId: collaboration.id ?? null,
       role: collaboration.role ?? null,
       customer: collaboration.customer,
     }),
@@ -96,7 +95,7 @@ export const FormConnectCollaborator = ({
   const [isReadingData, setIsReadingData] = useState(true);
 
   const [customersOutsideProject, setCustomersOutsideProject] = useState<
-    CustomerDto[]
+    CollaboratorDto[]
   >([]);
 
   const [contractorTypeName, setContractorTypeName] = useState<string>("");
@@ -111,9 +110,9 @@ export const FormConnectCollaborator = ({
       queryFn: async () => await getCollaboratorTypes(),
     });
 
-  const { data: customersData } = useQuery({
+  const { data: collaboratorsData } = useQuery({
     queryKey: ["customers"],
-    queryFn: async () => await getCustomers(),
+    queryFn: async () => await fetchCollaborators(),
   });
 
   const { data: userProfileData, isLoading: isLoadingUserProfile } = useQuery({
@@ -133,10 +132,10 @@ export const FormConnectCollaborator = ({
     setIsReadingData(isLoadingCollaboratorTypes || isLoadingUserProfile);
   }, [isLoadingCollaboratorTypes, isLoadingUserProfile]);
 
-  function filterCustomersOutsideProject() {
+  function filterCollaboratorsOutsideProject() {
     setIsReadingData(true);
 
-    if (!customersData) {
+    if (!collaboratorsData) {
       return;
     }
 
@@ -145,16 +144,16 @@ export const FormConnectCollaborator = ({
     });
 
     getProjectFullDataByIdAction(projectId).then((projectFullData) => {
-      const customersInProjectIds =
+      const collaboratorsInProjectIds =
         projectFullData.customersInProject.map(
           (collaboration) => collaboration.customer.id,
         ) ?? [];
 
-      const customersOutside = customersData.customers.filter(
-        (customer) => !customersInProjectIds.includes(customer.id!),
+      const collaboratorsOutside = collaboratorsData.customers.filter(
+        (customer) => !collaboratorsInProjectIds.includes(customer.id!),
       );
 
-      setCustomersOutsideProject(customersOutside);
+      setCustomersOutsideProject(collaboratorsOutside);
     });
 
     setIsReadingData(false);
@@ -185,8 +184,8 @@ export const FormConnectCollaborator = ({
   }, [openForm, queryClient]);
 
   useEffect(() => {
-    filterCustomersOutsideProject();
-  }, [customersData, refreshKey]);
+    filterCollaboratorsOutsideProject();
+  }, [collaboratorsData, refreshKey]);
 
   useEffect(() => {
     setIsThereContractorInProject(findContractorCollaborator(collaborations));
@@ -196,10 +195,11 @@ export const FormConnectCollaborator = ({
     control,
     handleSubmit,
     formState: { errors, isValid },
+    reset,
   } = useForm<CollaborationForm>({
     defaultValues: {
       customerId: "",
-      collaboratorTypeCode: "CUSTOMER",
+      collaboratorTypeCode: "",
     },
     resolver: zodResolver(collaborationFormSchema),
   });
@@ -207,12 +207,18 @@ export const FormConnectCollaborator = ({
   const onSubmit: SubmitHandler<CollaborationForm> = async (data) => {
     const submitData = {
       ...data,
-      // collaboratorType: collaboratorType!,
       projectId,
       userId: userProfileData?.user.id,
     };
 
     const submitResponse = await createCollaborationAction(submitData);
+
+    if (!isThereContractorInProject) {
+      reset({
+        customerId: "",
+        collaboratorTypeCode: "",
+      });
+    }
 
     setOpenAlertSnackBar({
       isOpen: true,
@@ -236,7 +242,7 @@ export const FormConnectCollaborator = ({
 
   return (
     <>
-      <AlreadyConnectedCustomers
+      <AlreadyConnectedCollaborators
         key={refreshKey}
         projectId={projectId}
         collaborations={collaborations}
@@ -246,21 +252,13 @@ export const FormConnectCollaborator = ({
       <GradientPaper style={{ marginTop: 16, padding: 16 }}>
         {!isReadingData && (
           <>
-            {/* <Typography
-              variant="body1"
-              sx={{ my: 2 }}
-            >
-              Temos {customersData ? customersData.customers.length : 0}{" "}
-              colaboradores cadastrados
-            </Typography> */}
-
-            {isThereContractorInProject && (
+            {!isThereContractorInProject && (
               <Alert
-                severity="info"
+                severity="error"
                 sx={{ mb: 2 }}
               >
-                {`Já existe um ${contractorTypeName.toLocaleLowerCase()} conectado a este
-                  projeto. Somente um por projeto.`}
+                {`Ainda não existe nenhum ${contractorTypeName.toLocaleLowerCase()} conectado a este
+                  projeto. É preciso um para gerar contratos.`}
               </Alert>
             )}
 
@@ -405,18 +403,31 @@ export const FormConnectCollaborator = ({
                           >
                             {collaboratorTypesData?.collaboratorTypes.map(
                               (mode) => {
-                                if (
-                                  !isThereContractorInProject ||
-                                  mode.code !== "CONTRACTOR"
-                                ) {
-                                  return (
-                                    <MenuItem
-                                      key={mode.code}
-                                      value={mode.code}
-                                    >
-                                      {mode.name}
-                                    </MenuItem>
-                                  );
+                                if (!isThereContractorInProject) {
+                                  // Exibir apenas CONTRACTOR quando for nulo ou false
+                                  if (mode.code === "CONTRACTOR") {
+                                    // TODO: Ajustar para que nesse caso o CONTRACTOR venha selecionado por padrão
+                                    return (
+                                      <MenuItem
+                                        key={mode.code}
+                                        value={mode.code}
+                                      >
+                                        {mode.name}
+                                      </MenuItem>
+                                    );
+                                  }
+                                } else {
+                                  // Exibir todas as opções exceto CONTRACTOR quando houver CONTRACTOR
+                                  if (mode.code !== "CONTRACTOR") {
+                                    return (
+                                      <MenuItem
+                                        key={mode.code}
+                                        value={mode.code}
+                                      >
+                                        {mode.name}
+                                      </MenuItem>
+                                    );
+                                  }
                                 }
                               },
                             )}
@@ -479,9 +490,9 @@ export const FormConnectCollaborator = ({
       <FullScreenDialog
         isOpened={openForm}
         onClose={() => setOpenForm(false)}
-        title="Criar cliente"
+        title="Criar colaborador"
       >
-        <FormCreateCustomerOnProject />
+        <FormCreateCollaboratorOnProject />
       </FullScreenDialog>
 
       <MainContextSnackbar />

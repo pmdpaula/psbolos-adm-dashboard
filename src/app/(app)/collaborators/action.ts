@@ -2,12 +2,12 @@
 
 import { HTTPError } from "ky";
 
-import type { CustomerDto } from "@/data/dto/customer-dto";
-import { createCustomer } from "@/http/customer/create-customer";
-import { deleteCustomer } from "@/http/customer/delete-customer";
-import { editCustomer } from "@/http/customer/edit-customer";
+import type { CollaboratorDto } from "@/data/dto/collaborator-dto";
+import { createCollaborator } from "@/http/collaborator/create-collaborator";
+import { deleteCollaborator } from "@/http/collaborator/delete-collaborator";
+import { editCollaborator } from "@/http/collaborator/edit-collaborator";
 
-export async function createCustomerAction(data: CustomerDto) {
+export async function createCollaboratorAction(data: CollaboratorDto) {
   const {
     name,
     registerNumber,
@@ -23,7 +23,7 @@ export async function createCustomerAction(data: CustomerDto) {
   } = data;
 
   try {
-    await createCustomer({
+    await createCollaborator({
       name,
       registerNumber,
       contactType1,
@@ -58,7 +58,7 @@ export async function createCustomerAction(data: CustomerDto) {
   };
 }
 
-export async function editCustomerAction(data: CustomerDto) {
+export async function editCollaboratorAction(data: CollaboratorDto) {
   const {
     id,
     name,
@@ -75,7 +75,7 @@ export async function editCustomerAction(data: CustomerDto) {
   } = data;
 
   try {
-    await editCustomer({
+    await editCollaborator({
       id,
       name,
       registerNumber,
@@ -90,7 +90,7 @@ export async function editCustomerAction(data: CustomerDto) {
       country,
     });
   } catch (error) {
-    console.error("🚀 ~ editCustomerAction:", error);
+    console.error("🚀 ~ editCollaboratorAction:", error);
     if (error instanceof HTTPError) {
       const { message } = await error.response.json();
 
@@ -112,11 +112,11 @@ export async function editCustomerAction(data: CustomerDto) {
   };
 }
 
-export async function deleteCustomerAction(id: string) {
+export async function deleteCollaboratorAction(id: string) {
   try {
-    await deleteCustomer(id);
+    await deleteCollaborator(id);
   } catch (error) {
-    console.error("🚀 ~ deleteCustomerAction:", error);
+    console.error("🚀 ~ deleteCollaboratorAction:", error);
     if (error instanceof HTTPError) {
       const { message } = await error.response.json();
 

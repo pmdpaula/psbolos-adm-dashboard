@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-import { customerDtoSchema } from "./customer-dto";
+import { collaboratorDtoSchema } from "./collaborator-dto";
 import { collaboratorTypeDtoSchema } from "./data-types/collaborator-type-dto";
 
 export const collaborationDtoSchema = z.object({
@@ -28,7 +28,7 @@ export const collaborationFullSchema = z.object({
   projectId: z.cuid2({ message: "Obrigatório" }),
   userId: z.cuid2().optional().nullable(),
   role: z.string().optional().nullable(),
-  customer: customerDtoSchema.optional(),
+  customer: collaboratorDtoSchema.optional(),
 });
 
 export type CollaborationFull = z.infer<typeof collaborationFullSchema>;

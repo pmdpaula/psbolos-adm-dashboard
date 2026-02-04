@@ -17,20 +17,20 @@ import {
 import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
-import { createCustomerAction } from "@/app/(app)/customer/action";
+import { createCollaboratorAction } from "@/app/(app)/collaborators/action";
 import { useMainContext } from "@/app/MainContext";
 import { StyledFormHelperText } from "@/components/form-fields/StyledFormHelperText";
 import { StyledOutlinedInput } from "@/components/form-fields/StyledOutlinedInput";
-import type { CustomerDto } from "@/data/dto/customer-dto";
-import { customerDtoSchema } from "@/data/dto/customer-dto";
+import type { CollaboratorDto } from "@/data/dto/collaborator-dto";
+import { collaboratorDtoSchema } from "@/data/dto/collaborator-dto";
 import {
-  customerContactTypeDescription,
-  customerContactTypeType,
-} from "@/lib/customer-contact-type";
+  collaboratorContactTypeDescription,
+  collaboratorContactTypeType,
+} from "@/lib/collaborator-contact-type";
 
 import { useProjectContext } from "../../ProjectContext";
 
-export const FormCreateCustomerOnProject = () => {
+export const FormCreateCollaboratorOnProject = () => {
   const { setOpenAlertSnackBar } = useMainContext();
   const { setRefreshKey, setOpenForm } = useProjectContext();
 
@@ -40,7 +40,7 @@ export const FormCreateCustomerOnProject = () => {
     watch,
     setValue,
     formState: { errors, isLoading, isValid, isDirty },
-  } = useForm<CustomerDto>({
+  } = useForm<CollaboratorDto>({
     defaultValues: {
       name: "",
       registerNumber: null,
@@ -54,7 +54,7 @@ export const FormCreateCustomerOnProject = () => {
       zipCode: null,
       country: "Brasil",
     },
-    resolver: zodResolver(customerDtoSchema),
+    resolver: zodResolver(collaboratorDtoSchema),
     mode: "all", // Valida onChange + onBlur
   });
 
@@ -109,8 +109,8 @@ export const FormCreateCustomerOnProject = () => {
     }
   }, [isDirty, isValid, isLoading]);
 
-  const onSubmit: SubmitHandler<CustomerDto> = async (data) => {
-    const submitResponse = await createCustomerAction(data);
+  const onSubmit: SubmitHandler<CollaboratorDto> = async (data) => {
+    const submitResponse = await createCollaboratorAction(data);
 
     setRefreshKey((k) => k + 1);
     setOpenForm(false);
@@ -245,8 +245,9 @@ export const FormCreateCustomerOnProject = () => {
                       <em>Selecione um tipo</em>
                     </MenuItem>
 
-                    {Object.values(customerContactTypeType).map((type) => {
-                      const description = customerContactTypeDescription[type];
+                    {Object.values(collaboratorContactTypeType).map((type) => {
+                      const description =
+                        collaboratorContactTypeDescription[type];
 
                       return (
                         <MenuItem
@@ -296,7 +297,7 @@ export const FormCreateCustomerOnProject = () => {
                     {errors.contact1
                       ? errors.contact1.message
                       : contactType1 &&
-                          contactType1 !== customerContactTypeType.OTHER
+                          contactType1 !== collaboratorContactTypeType.OTHER
                         ? "Campo obrigatório quando tipo selecionado"
                         : "Selecione um tipo de contato primeiro"}
                   </StyledFormHelperText>
@@ -334,8 +335,9 @@ export const FormCreateCustomerOnProject = () => {
                       <em>Selecione um tipo</em>
                     </MenuItem>
 
-                    {Object.values(customerContactTypeType).map((type) => {
-                      const description = customerContactTypeDescription[type];
+                    {Object.values(collaboratorContactTypeType).map((type) => {
+                      const description =
+                        collaboratorContactTypeDescription[type];
 
                       return (
                         <MenuItem
@@ -385,7 +387,7 @@ export const FormCreateCustomerOnProject = () => {
                     {errors.contact2
                       ? errors.contact2.message
                       : contactType2 &&
-                          contactType2 !== customerContactTypeType.OTHER
+                          contactType2 !== collaboratorContactTypeType.OTHER
                         ? "Campo obrigatório quando tipo selecionado"
                         : "Selecione um tipo de contato primeiro"}
                   </StyledFormHelperText>

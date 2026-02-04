@@ -1,4 +1,4 @@
-import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+// import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import EditIcon from "@mui/icons-material/Edit";
 import PersonAddTwoToneIcon from "@mui/icons-material/PersonAddTwoTone";
 import { Box, Button, Stack, Typography } from "@mui/material";
@@ -16,13 +16,13 @@ import {
 import { ptBR } from "@mui/x-data-grid/locales";
 import { useEffect, useState } from "react";
 
-import type { CustomerDto } from "@/data/dto/customer-dto";
-import { getCustomers } from "@/http/customer/get-customers";
+import type { CollaboratorDto } from "@/data/dto/collaborator-dto";
+import { fetchCollaborators } from "@/http/collaborator/fetch-collaborators";
 
 import { FullScreenDialog } from "../../../components/FullScreenDialog";
-import { useCustomerContext } from "./CustomerContext";
-import { FormCreateCustomer } from "./FormCreateCustomer";
-import { FormCustomer } from "./FormCustomer";
+import { useCollaboratorContext } from "./CollaboratorContext";
+import { FormCollaborator } from "./FormCollaborator";
+import { FormCreateCollaborator } from "./FormCreateCollaborator";
 import type { ActionFormProps } from "./page";
 
 function cpfCnpjFormatter(value: string) {
@@ -82,33 +82,33 @@ declare module "@mui/x-data-grid" {
   }
 }
 
-export const CustomerDataTable = () => {
+export const CollaboratorDataTable = () => {
   const {
     openForm,
     setOpenForm,
-    setCustomerContext,
+    setCollaboratorContext,
     openAlertSnackBar,
     setOpenAlertSnackBar,
-  } = useCustomerContext();
+  } = useCollaboratorContext();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [rows, setRows] = useState<CustomerDto[]>([] as CustomerDto[]);
+  const [rows, setRows] = useState<CollaboratorDto[]>([] as CollaboratorDto[]);
 
-  async function reloadCustomersDbData() {
-    const { customers } = await getCustomers();
-    setRows(customers);
+  async function reloadCollaboratorsDbData() {
+    const { customers: collaborators } = await fetchCollaborators();
+    setRows(collaborators);
     setIsLoading(false);
   }
 
   useEffect(() => {
     if (!openForm.open) {
       setIsLoading(true);
-      reloadCustomersDbData();
+      reloadCollaboratorsDbData();
       setIsLoading(false);
     }
   }, [openForm]);
 
-  const customersColumns: GridColDef<CustomerDto>[] = [
+  const collaboratorsColumns: GridColDef<CollaboratorDto>[] = [
     {
       field: "actions",
       type: "actions",
@@ -126,14 +126,14 @@ export const CustomerDataTable = () => {
             }}
             color="inherit"
           />,
-          <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Delete"
-            onClick={() => {
-              handleCallForm("delete", row);
-            }}
-            color="inherit"
-          />,
+          // <GridActionsCellItem
+          //   icon={<DeleteIcon />}
+          //   label="Delete"
+          //   onClick={() => {
+          //     handleCallForm("delete", row);
+          //   }}
+          //   color="inherit"
+          // />,
         ];
       },
     },
@@ -221,10 +221,10 @@ export const CustomerDataTable = () => {
   ];
 
   function handleCallForm(action: ActionFormProps, row: GridRowModel) {
-    let customerData: CustomerDto | CustomerDto;
+    let collaboratorData: CollaboratorDto | CollaboratorDto;
 
     if (action === "edit" || action === "delete") {
-      customerData = {
+      collaboratorData = {
         id: row.id,
         name: row.name,
         registerNumber: row.registerNumber,
@@ -239,11 +239,11 @@ export const CustomerDataTable = () => {
         country: row.country,
       };
     } else {
-      customerData = row as CustomerDto;
+      collaboratorData = row as CollaboratorDto;
     }
 
     setOpenForm({ open: true, action });
-    setCustomerContext(customerData);
+    setCollaboratorContext(collaboratorData);
   }
 
   function closeOpenForm() {
@@ -279,12 +279,12 @@ export const CustomerDataTable = () => {
             gutterBottom
             sx={{ flexGrow: 1 }}
           >
-            Clientes
+            Colaboradores
           </Typography>
 
-          <Tooltip title="Adicionar Cliente">
+          <Tooltip title="Adicionar Colaborador">
             <Button
-              onClick={() => handleCallForm("create", {} as CustomerDto)}
+              onClick={() => handleCallForm("create", {} as CollaboratorDto)}
               variant="text"
             >
               <PersonAddTwoToneIcon />
@@ -295,7 +295,7 @@ export const CustomerDataTable = () => {
         <DataGrid
           localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
           rows={rows}
-          columns={customersColumns}
+          columns={collaboratorsColumns}
           loading={isLoading}
           initialState={{
             columns: {
@@ -342,9 +342,9 @@ export const CustomerDataTable = () => {
         }
       >
         {openForm.action === "create" ? (
-          <FormCreateCustomer />
+          <FormCreateCollaborator />
         ) : (
-          <FormCustomer />
+          <FormCollaborator />
         )}
       </FullScreenDialog>
 

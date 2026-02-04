@@ -1,4 +1,4 @@
-export const customerContactTypeType = {
+export const collaboratorContactTypeType = {
   OTHER: "OTHER",
   EMAIL: "EMAIL",
   PHONE: "PHONE",
@@ -8,7 +8,7 @@ export const customerContactTypeType = {
   TIKTOK: "TIKTOK",
 } as const;
 
-export const customerContactTypeDescription = {
+export const collaboratorContactTypeDescription = {
   OTHER: "Outro",
   EMAIL: "E-mail",
   PHONE: "Telefone",
@@ -18,5 +18,5 @@ export const customerContactTypeDescription = {
   TIKTOK: "TikTok",
 } as const;
 
-export type CustomerContactTypeType =
-  (typeof customerContactTypeType)[keyof typeof customerContactTypeType];
+export type CollaboratorContactTypeType =
+  (typeof collaboratorContactTypeType)[keyof typeof collaboratorContactTypeType];

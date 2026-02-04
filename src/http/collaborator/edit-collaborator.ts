@@ -1,10 +1,11 @@
 "use server";
 
-import type { CustomerDto } from "@/data/dto/customer-dto";
+import type { CollaboratorDto } from "@/data/dto/collaborator-dto";
 
 import { apiClient } from "../api-client";
 
-export async function createCustomer({
+export async function editCollaborator({
+  id,
   name,
   registerNumber,
   contactType1,
@@ -16,8 +17,8 @@ export async function createCustomer({
   state,
   zipCode,
   country,
-}: CustomerDto): Promise<unknown> {
-  const result = await apiClient.post(`customers`, {
+}: CollaboratorDto): Promise<unknown> {
+  const result = await apiClient.put(`customers/${id}`, {
     json: {
       name,
       registerNumber,

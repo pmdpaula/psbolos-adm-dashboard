@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import DeleteSharpIcon from "@mui/icons-material/DeleteSharp";
 import SaveIcon from "@mui/icons-material/Save";
 import {
   Backdrop,
@@ -12,70 +11,54 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  type SelectChangeEvent,
+  SelectChangeEvent,
   Stack,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
 import { StyledFormHelperText } from "@/components/form-fields/StyledFormHelperText";
-import { StyledInput } from "@/components/form-fields/StyledInput";
 import { StyledOutlinedInput } from "@/components/form-fields/StyledOutlinedInput";
-import { type CustomerDto, customerDtoSchema } from "@/data/dto/customer-dto";
 import {
-  customerContactTypeDescription,
-  customerContactTypeType,
-} from "@/lib/customer-contact-type";
+  type CollaboratorDto,
+  collaboratorDtoSchema,
+} from "@/data/dto/collaborator-dto";
+import {
+  collaboratorContactTypeDescription,
+  collaboratorContactTypeType,
+} from "@/lib/collaborator-contact-type";
 
-import { deleteCustomerAction, editCustomerAction } from "./action";
-import { useCustomerContext } from "./CustomerContext";
+import { createCollaboratorAction } from "./action";
+import { useCollaboratorContext } from "./CollaboratorContext";
 
-// export const StyledOutlinedInput = styled(OutlinedInput, {
-//   shouldForwardProp: (prop) => prop !== "error",
-// })<{ error?: boolean }>(({ error }) => ({
-//   boxShadow: error ? "0px 0px 12px 2px rgba(255,0,0,0.5)" : "",
-// }));
-
-// export const StyledInput = styled(Input, {
-//   shouldForwardProp: (prop) => prop !== "error",
-// })<{ error?: boolean }>(({ error }) => ({
-//   boxShadow: error ? "0px 0px 12px 2px rgba(255,0,0,0.5)" : "",
-// }));
-
-export const FormCustomer = () => {
-  const { openForm, setOpenForm, setOpenAlertSnackBar, customerContext } =
-    useCustomerContext();
+export const FormCreateCollaborator = () => {
+  const { openForm, setOpenForm, setOpenAlertSnackBar } =
+    useCollaboratorContext();
 
   const action = openForm.action;
-
-  if (action === "edit" && !customerContext) {
-    throw new Error("Os dados do cliente são obrigatórios para edição.");
-  }
-
   const {
     control,
     handleSubmit,
-    setValue,
     watch,
+    setValue,
     formState: { errors, isLoading, isValid, isDirty },
-  } = useForm<CustomerDto>({
+  } = useForm<CollaboratorDto>({
     defaultValues: {
-      ...customerContext,
-      registerNumber: customerContext.registerNumber || null,
-      contactType1: customerContext.contactType1 || null,
-      contact1: customerContext.contact1 || null,
-      contactType2: customerContext.contactType2 || null,
-      contact2: customerContext.contact2 || null,
-      address: customerContext.address || null,
-      city: customerContext.city || null,
-      state: customerContext.state || null,
-      zipCode: customerContext.zipCode || null,
-      country: customerContext.country || null,
+      name: "",
+      registerNumber: null,
+      contact1: null,
+      contactType1: null,
+      contact2: null,
+      contactType2: null,
+      address: null,
+      city: "Rio de Janeiro",
+      state: "RJ",
+      zipCode: null,
+      country: "Brasil",
     },
-    resolver: zodResolver(customerDtoSchema),
+    resolver: zodResolver(collaboratorDtoSchema),
     mode: "all", // Valida onChange + onBlur
   });
-
   const [contactType1, contactType2] = watch(["contactType1", "contactType2"]);
 
   function handleChangeContactType1(event: SelectChangeEvent<string>) {
@@ -109,26 +92,17 @@ export const FormCustomer = () => {
   }, [isLoading]);
 
   useEffect(() => {
-    if (action === "edit") {
-      if (!isDirty || (isDirty && !isValid)) {
-        setIsButtonDisabled(true);
-      } else {
-        setIsButtonDisabled(false);
-      }
+    if (!isDirty) {
+      setIsButtonDisabled(true);
+    } else if (isDirty && !isValid) {
+      setIsButtonDisabled(true);
     } else {
-      // delete
-      setIsButtonDisabled(isLoading);
+      setIsButtonDisabled(false);
     }
   }, [isDirty, isValid, action, isLoading]);
 
-  const onSubmit: SubmitHandler<CustomerDto> = async (data) => {
-    let submitResponse;
-
-    if (action === "edit") {
-      submitResponse = await editCustomerAction(data);
-    } else {
-      submitResponse = await deleteCustomerAction(data.id!);
-    }
+  const onSubmit: SubmitHandler<CollaboratorDto> = async (data) => {
+    const submitResponse = await createCollaboratorAction(data);
 
     if (submitResponse.success) {
       setOpenForm({ open: false, action: "none" });
@@ -155,9 +129,7 @@ export const FormCustomer = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack
             spacing={2}
-            alignSelf="center"
-            justifyContent="center"
-            sx={{ mt: 2, maxWidth: 600 }}
+            sx={{ mt: 2 }}
           >
             <Controller
               name="name"
@@ -168,7 +140,6 @@ export const FormCustomer = () => {
                   fullWidth
                   error={errors.name ? true : false}
                   color={errors.name ? "error" : "secondary"}
-                  variant={action === "delete" ? "standard" : "outlined"}
                 >
                   <InputLabel
                     htmlFor="name"
@@ -176,24 +147,15 @@ export const FormCustomer = () => {
                   >
                     Nome
                   </InputLabel>
-                  {action === "delete" ? (
-                    <StyledInput
-                      size="small"
-                      id="name"
-                      {...field}
-                      value={field.value}
-                      disabled={action === "delete"}
-                    />
-                  ) : (
-                    <StyledOutlinedInput
-                      size="small"
-                      id="name"
-                      label="Nome"
-                      {...field}
-                      value={field.value || ""}
-                      error={errors.name ? true : false}
-                    />
-                  )}
+
+                  <StyledOutlinedInput
+                    size="small"
+                    id="name"
+                    label="Nome"
+                    {...field}
+                    value={field.value || ""}
+                    error={errors.name ? true : false}
+                  />
 
                   <StyledFormHelperText component="p">
                     {errors.name?.message}
@@ -211,7 +173,6 @@ export const FormCustomer = () => {
                   fullWidth
                   error={errors.registerNumber ? true : false}
                   color={errors.registerNumber ? "error" : "secondary"}
-                  disabled={action === "delete"}
                 >
                   <InputLabel
                     size="small"
@@ -219,24 +180,15 @@ export const FormCustomer = () => {
                   >
                     CPF/CNPJ
                   </InputLabel>
-                  {action === "delete" ? (
-                    <StyledInput
-                      size="small"
-                      id="registerNumber"
-                      {...field}
-                      value={field.value || ""}
-                      disabled={action === "delete"}
-                    />
-                  ) : (
-                    <StyledOutlinedInput
-                      size="small"
-                      id="registerNumber"
-                      label="CPF/CNPJ"
-                      {...field}
-                      value={field.value || ""}
-                      error={errors.registerNumber ? true : false}
-                    />
-                  )}
+
+                  <StyledOutlinedInput
+                    size="small"
+                    id="registerNumber"
+                    label="CPF/CNPJ"
+                    {...field}
+                    value={field.value || ""}
+                    error={errors.registerNumber ? true : false}
+                  />
 
                   <FormHelperText
                     component="p"
@@ -262,7 +214,6 @@ export const FormCustomer = () => {
                   fullWidth
                   error={errors.contactType1 ? true : false}
                   color={errors.contactType1 ? "error" : "secondary"}
-                  variant={action === "delete" ? "standard" : "outlined"}
                 >
                   <InputLabel
                     size="small"
@@ -279,12 +230,14 @@ export const FormCustomer = () => {
                     label="Tipo"
                     size="small"
                     onChange={handleChangeContactType1}
-                    disabled={action === "delete"}
                   >
-                    <MenuItem>...</MenuItem>
+                    <MenuItem value="">
+                      <em>Selecione um tipo</em>
+                    </MenuItem>
 
-                    {Object.values(customerContactTypeType).map((type) => {
-                      const description = customerContactTypeDescription[type];
+                    {Object.values(collaboratorContactTypeType).map((type) => {
+                      const description =
+                        collaboratorContactTypeDescription[type];
 
                       return (
                         <MenuItem
@@ -313,7 +266,6 @@ export const FormCustomer = () => {
                   error={errors.contact1 ? true : false}
                   color={errors.contact1 ? "error" : "secondary"}
                   disabled={!contactType1}
-                  variant={action === "delete" ? "standard" : "outlined"}
                 >
                   <InputLabel
                     size="small"
@@ -321,27 +273,23 @@ export const FormCustomer = () => {
                   >
                     Contato
                   </InputLabel>
-                  {action === "delete" ? (
-                    <StyledInput
-                      size="small"
-                      id="contact1"
-                      {...field}
-                      value={field.value || ""}
-                      disabled={action === "delete"}
-                    />
-                  ) : (
-                    <StyledOutlinedInput
-                      size="small"
-                      id="contact1"
-                      label="Contato"
-                      {...field}
-                      value={field.value || ""}
-                      error={errors.contact1 ? true : false}
-                    />
-                  )}
+
+                  <StyledOutlinedInput
+                    size="small"
+                    id="contact1"
+                    label="Contato"
+                    {...field}
+                    value={field.value || ""}
+                    error={errors.contact1 ? true : false}
+                  />
 
                   <StyledFormHelperText component="p">
-                    {errors.contact1?.message}
+                    {errors.contact1
+                      ? errors.contact1.message
+                      : contactType1 &&
+                          contactType1 !== collaboratorContactTypeType.OTHER
+                        ? "Campo obrigatório quando tipo selecionado"
+                        : "Selecione um tipo de contato primeiro"}
                   </StyledFormHelperText>
                 </FormControl>
               )}
@@ -356,7 +304,6 @@ export const FormCustomer = () => {
                   fullWidth
                   error={errors.contactType2 ? true : false}
                   color={errors.contactType2 ? "error" : "secondary"}
-                  variant={action === "delete" ? "standard" : "outlined"}
                 >
                   <InputLabel
                     size="small"
@@ -373,12 +320,14 @@ export const FormCustomer = () => {
                     label="Tipo"
                     size="small"
                     onChange={handleChangeContactType2}
-                    disabled={action === "delete"}
                   >
-                    <MenuItem>...</MenuItem>
+                    <MenuItem value="">
+                      <em>Selecione um tipo</em>
+                    </MenuItem>
 
-                    {Object.values(customerContactTypeType).map((type) => {
-                      const description = customerContactTypeDescription[type];
+                    {Object.values(collaboratorContactTypeType).map((type) => {
+                      const description =
+                        collaboratorContactTypeDescription[type];
 
                       return (
                         <MenuItem
@@ -415,29 +364,22 @@ export const FormCustomer = () => {
                     Contato
                   </InputLabel>
 
-                  {action === "delete" ? (
-                    <StyledInput
-                      size="small"
-                      id="contact2"
-                      {...field}
-                      value={field.value || ""}
-                      disabled={action === "delete"}
-                    />
-                  ) : (
-                    <StyledOutlinedInput
-                      size="small"
-                      id="registerNumber"
-                      label="CPF/CNPJ"
-                      {...field}
-                      value={field.value || ""}
-                      error={errors.contact2 ? true : false}
-                    />
-                  )}
+                  <StyledOutlinedInput
+                    size="small"
+                    id="contact2"
+                    label="Contato"
+                    {...field}
+                    value={field.value || ""}
+                    error={errors.contact2 ? true : false}
+                  />
 
                   <StyledFormHelperText component="p">
                     {errors.contact2
                       ? errors.contact2.message
-                      : "habilitado quando o telefone 1 for preenchido"}
+                      : contactType2 &&
+                          contactType2 !== collaboratorContactTypeType.OTHER
+                        ? "Campo obrigatório quando tipo selecionado"
+                        : "Selecione um tipo de contato primeiro"}
                   </StyledFormHelperText>
                 </FormControl>
               )}
@@ -451,8 +393,6 @@ export const FormCustomer = () => {
                   fullWidth
                   error={errors.address ? true : false}
                   color={errors.address ? "error" : "secondary"}
-                  disabled={action === "delete"}
-                  variant={action === "delete" ? "standard" : "outlined"}
                 >
                   <InputLabel
                     size="small"
@@ -460,24 +400,15 @@ export const FormCustomer = () => {
                   >
                     Endereço
                   </InputLabel>
-                  {action === "delete" ? (
-                    <StyledInput
-                      size="small"
-                      id="address"
-                      {...field}
-                      value={field.value}
-                      disabled={action === "delete"}
-                    />
-                  ) : (
-                    <StyledOutlinedInput
-                      size="small"
-                      id="address"
-                      label="Endereço"
-                      {...field}
-                      value={field.value || ""}
-                      error={errors.address ? true : false}
-                    />
-                  )}
+
+                  <StyledOutlinedInput
+                    size="small"
+                    id="address"
+                    label="Endereço"
+                    {...field}
+                    value={field.value || ""}
+                    error={errors.address ? true : false}
+                  />
 
                   <StyledFormHelperText component="p">
                     {errors.address?.message}
@@ -494,8 +425,6 @@ export const FormCustomer = () => {
                   fullWidth
                   error={errors.zipCode ? true : false}
                   color={errors.zipCode ? "error" : "secondary"}
-                  disabled={action === "delete"}
-                  variant={action === "delete" ? "standard" : "outlined"}
                 >
                   <InputLabel
                     size="small"
@@ -503,24 +432,15 @@ export const FormCustomer = () => {
                   >
                     CEP
                   </InputLabel>
-                  {action === "delete" ? (
-                    <StyledInput
-                      size="small"
-                      id="zipCode"
-                      {...field}
-                      value={field.value || ""}
-                      disabled={action === "delete"}
-                    />
-                  ) : (
-                    <StyledOutlinedInput
-                      size="small"
-                      id="zipCode"
-                      label="CEP"
-                      {...field}
-                      value={field.value || ""}
-                      error={errors.zipCode ? true : false}
-                    />
-                  )}
+
+                  <StyledOutlinedInput
+                    size="small"
+                    id="zipCode"
+                    label="CEP"
+                    {...field}
+                    value={field.value || ""}
+                    error={errors.zipCode ? true : false}
+                  />
 
                   <StyledFormHelperText component="p">
                     {errors.zipCode?.message}
@@ -537,7 +457,6 @@ export const FormCustomer = () => {
                   fullWidth
                   error={errors.city ? true : false}
                   color={errors.city ? "error" : "secondary"}
-                  disabled={action === "delete"}
                 >
                   <InputLabel
                     size="small"
@@ -545,24 +464,15 @@ export const FormCustomer = () => {
                   >
                     Cidade
                   </InputLabel>
-                  {action === "delete" ? (
-                    <StyledInput
-                      size="small"
-                      id="city"
-                      {...field}
-                      value={field.value || ""}
-                      disabled={action === "delete"}
-                    />
-                  ) : (
-                    <StyledOutlinedInput
-                      size="small"
-                      id="city"
-                      label="Cidade"
-                      {...field}
-                      value={field.value || ""}
-                      error={errors.city ? true : false}
-                    />
-                  )}
+
+                  <StyledOutlinedInput
+                    size="small"
+                    id="city"
+                    label="Cidade"
+                    {...field}
+                    value={field.value || ""}
+                    error={errors.city ? true : false}
+                  />
 
                   <StyledFormHelperText component="p">
                     {errors.city?.message}
@@ -579,7 +489,6 @@ export const FormCustomer = () => {
                   fullWidth
                   error={errors.state ? true : false}
                   color={errors.state ? "error" : "secondary"}
-                  disabled={action === "delete"}
                 >
                   <InputLabel
                     size="small"
@@ -587,24 +496,15 @@ export const FormCustomer = () => {
                   >
                     Estado
                   </InputLabel>
-                  {action === "delete" ? (
-                    <StyledInput
-                      size="small"
-                      id="state"
-                      {...field}
-                      value={field.value}
-                      disabled={action === "delete"}
-                    />
-                  ) : (
-                    <StyledOutlinedInput
-                      size="small"
-                      id="state"
-                      label="Estado"
-                      {...field}
-                      value={field.value || ""}
-                      error={errors.state ? true : false}
-                    />
-                  )}
+
+                  <StyledOutlinedInput
+                    size="small"
+                    id="state"
+                    label="Estado"
+                    {...field}
+                    value={field.value || ""}
+                    error={errors.state ? true : false}
+                  />
 
                   <StyledFormHelperText component="p">
                     {errors.state?.message}
@@ -621,7 +521,6 @@ export const FormCustomer = () => {
                   fullWidth
                   error={errors.country ? true : false}
                   color={errors.country ? "error" : "secondary"}
-                  disabled={action === "delete"}
                 >
                   <InputLabel
                     size="small"
@@ -629,24 +528,15 @@ export const FormCustomer = () => {
                   >
                     País
                   </InputLabel>
-                  {action === "delete" ? (
-                    <StyledInput
-                      size="small"
-                      id="country"
-                      {...field}
-                      value={field.value}
-                      disabled={action === "delete"}
-                    />
-                  ) : (
-                    <StyledOutlinedInput
-                      size="small"
-                      id="country"
-                      label="País"
-                      {...field}
-                      value={field.value || ""}
-                      error={errors.country ? true : false}
-                    />
-                  )}
+
+                  <StyledOutlinedInput
+                    size="small"
+                    id="country"
+                    label="País"
+                    {...field}
+                    value={field.value || ""}
+                    error={errors.country ? true : false}
+                  />
 
                   <StyledFormHelperText component="p">
                     {errors.country?.message}
@@ -660,7 +550,7 @@ export const FormCustomer = () => {
             <Button
               type="submit"
               variant="contained"
-              color={action === "delete" ? "error" : "secondary"}
+              color="secondary"
               fullWidth
               size="large"
               sx={{ mt: 5, height: 42 }}
@@ -668,14 +558,12 @@ export const FormCustomer = () => {
               startIcon={
                 isLoading ? (
                   <CircularProgress size={24} />
-                ) : action === "delete" ? (
-                  <DeleteSharpIcon fontSize="small" />
                 ) : (
                   <SaveIcon fontSize="small" />
                 )
               }
             >
-              {action === "delete" ? "Deletar" : "Salvar"}
+              Salvar
             </Button>
           }
         </form>

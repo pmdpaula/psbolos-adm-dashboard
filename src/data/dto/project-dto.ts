@@ -2,7 +2,7 @@ import * as z from "zod";
 
 import { eventTypeDtoSchema } from "@/data/dto/data-types/event-type-dto";
 
-import { customerDtoSchema } from "./customer-dto";
+import { collaboratorDtoSchema } from "./collaborator-dto";
 import { cakeBatterDtoSchema } from "./data-types/cake-batter-dto";
 import { cakeFillingDtoSchema } from "./data-types/cake-filling-dto";
 import { collaboratorTypeDtoSchema } from "./data-types/collaborator-type-dto";
@@ -139,7 +139,7 @@ export const projectFullDataDtoSchema = z.object({
       id: z.cuid2(),
       role: z.string(),
       collaboratorType: collaboratorTypeDtoSchema,
-      customer: customerDtoSchema,
+      customer: collaboratorDtoSchema,
     }),
   ),
   cakes: z.array(

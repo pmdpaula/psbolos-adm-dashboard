@@ -6,14 +6,14 @@ import type { CollaborationDto } from "@/data/dto/collaboration-dto";
 import { createCollaboration } from "@/http/collaboration/connect-collaborator";
 import { disconnectCollaborator } from "@/http/collaboration/disconnect-collaborator";
 import { fetchCollaborationsByProjectId } from "@/http/collaboration/fetch-collaborations-by-project-id";
-import { fetchCustomersByProjectId } from "@/http/collaboration/fetch-customers-by-project-id";
-import { getCustomers } from "@/http/customer/get-customers";
+import { fetchCollaboratorsByProjectId } from "@/http/collaboration/fetch-collaborators-by-project-id";
+import { fetchCollaborators } from "@/http/collaborator/fetch-collaborators";
 import { getCollaboratorTypes } from "@/http/data-types/get-collaborator-types";
 
-export async function getCustomersAction() {
-  const customers = await getCustomers();
+export async function getCollaboratorAction() {
+  const collaborator = await fetchCollaborators();
 
-  return customers;
+  return collaborator;
 }
 
 export async function getCollaboratorTypesAction() {
@@ -28,10 +28,10 @@ export async function fetchCollaborationsByProjectIdAction(projectId: string) {
   return collaborations;
 }
 
-export async function getCustomersByProjectIdAction(projectId: string) {
-  const customers = await fetchCustomersByProjectId(projectId);
+export async function getCollaboratorByProjectIdAction(projectId: string) {
+  const collaborator = await fetchCollaboratorsByProjectId(projectId);
 
-  return customers;
+  return collaborator;
 }
 
 export async function createCollaborationAction(data: CollaborationDto) {

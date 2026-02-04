@@ -23,7 +23,7 @@ const HomePage = () => {
         </GlassCardHover>
       </Link>
 
-      <Link href="/customer">
+      <Link href="/collaborators">
         <GlassCardHover
           color="primary"
           sx={{
@@ -35,7 +35,7 @@ const HomePage = () => {
             color="pink"
             sx={{ fontWeight: "bold" }}
           >
-            Clientes
+            Colaboradores
           </Typography>
         </GlassCardHover>
       </Link>

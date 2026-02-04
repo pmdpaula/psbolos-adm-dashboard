@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { customerContactTypeType } from "@/lib/customer-contact-type";
+import { collaboratorContactTypeType } from "@/lib/collaborator-contact-type";
 
-export const customerDtoSchema = z.object({
+export const collaboratorDtoSchema = z.object({
   id: z.cuid2().optional(),
 
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres.").max(100),
@@ -18,7 +18,7 @@ export const customerDtoSchema = z.object({
     }, "O número de registro deve ter 11 (CPF) ou 14 (CNPJ) caracteres e conter apenas dígitos."),
 
   contactType1: z
-    .enum(Object.values(customerContactTypeType) as [string, ...string[]])
+    .enum(Object.values(collaboratorContactTypeType) as [string, ...string[]])
     .nullable()
     // .or(z.literal(""))
     .transform((val) => (val === "" ? null : val)),
@@ -30,7 +30,7 @@ export const customerDtoSchema = z.object({
     .transform((val) => (val === "" ? null : val)),
 
   contactType2: z
-    .enum(Object.values(customerContactTypeType) as [string, ...string[]])
+    .enum(Object.values(collaboratorContactTypeType) as [string, ...string[]])
     .nullable()
     // .or(z.literal(""))
     .transform((val) => (val === "" ? null : val)),
@@ -53,4 +53,4 @@ export const customerDtoSchema = z.object({
   country: z.string().max(100).nullable().or(z.literal("")),
 });
 
-export type CustomerDto = z.infer<typeof customerDtoSchema>;
+export type CollaboratorDto = z.infer<typeof collaboratorDtoSchema>;

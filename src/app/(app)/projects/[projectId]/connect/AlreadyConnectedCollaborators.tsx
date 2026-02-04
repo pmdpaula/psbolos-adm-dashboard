@@ -37,17 +37,17 @@ import { useProjectContext } from "../../ProjectContext";
 import { disconnectCollaboratorAction } from "./actions";
 import { fetchCollaborationsInProject } from "./FormConnectCollaborator";
 
-interface AlreadyConnectedCustomersProps {
+interface AlreadyConnectedCollaboratorsProps {
   collaborations: CollaborationFull[];
   setCollaborations: React.Dispatch<React.SetStateAction<CollaborationFull[]>>;
   projectId: string;
 }
 
-export const AlreadyConnectedCustomers = ({
+export const AlreadyConnectedCollaborators = ({
   collaborations,
   setCollaborations,
   projectId,
-}: AlreadyConnectedCustomersProps) => {
+}: AlreadyConnectedCollaboratorsProps) => {
   const { setOpenAlertSnackBar } = useMainContext();
   const { setRefreshKey } = useProjectContext();
   const theme = useTheme();
