@@ -9,7 +9,7 @@ import { getProjectById } from "@/http/project/get-project-by-id";
 
 import { useProjectContext } from "../../ProjectContext";
 
-const CreateCustomerOnProjectPage = () => {
+const CreateCollaboratorOnProjectPage = () => {
   const { projectContext, setProjectContext } = useProjectContext();
   const [isReadingData, setIsReadingData] = useState(true);
 
@@ -60,4 +60,4 @@ const CreateCustomerOnProjectPage = () => {
   );
 };
 
-export default CreateCustomerOnProjectPage;
+export default CreateCollaboratorOnProjectPage;

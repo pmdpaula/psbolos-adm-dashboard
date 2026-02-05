@@ -5,12 +5,12 @@ import type { CollaboratorDto } from "@/data/dto/collaborator-dto";
 import { apiClient } from "../api-client";
 
 interface FetchCollaboratorsResponse {
-  customers: CollaboratorDto[];
+  collaborators: CollaboratorDto[];
 }
 
 export async function fetchCollaborators(): Promise<FetchCollaboratorsResponse> {
   const result = await apiClient
-    .get("customers")
+    .get("collaborators")
     .json<FetchCollaboratorsResponse>();
 
   return result;

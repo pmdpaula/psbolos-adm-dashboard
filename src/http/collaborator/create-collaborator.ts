@@ -17,7 +17,7 @@ export async function createCollaborator({
   zipCode,
   country,
 }: CollaboratorDto): Promise<unknown> {
-  const result = await apiClient.post(`customers`, {
+  const result = await apiClient.post(`collaborators`, {
     json: {
       name,
       registerNumber,

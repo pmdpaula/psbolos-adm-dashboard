@@ -95,7 +95,7 @@ export const CollaboratorDataTable = () => {
   const [rows, setRows] = useState<CollaboratorDto[]>([] as CollaboratorDto[]);
 
   async function reloadCollaboratorsDbData() {
-    const { customers: collaborators } = await fetchCollaborators();
+    const { collaborators: collaborators } = await fetchCollaborators();
     setRows(collaborators);
     setIsLoading(false);
   }

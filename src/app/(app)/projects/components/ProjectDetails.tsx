@@ -11,13 +11,13 @@ interface ProjectDetailsProps {
 }
 
 export const ProjectDetails = ({ projectFullData }: ProjectDetailsProps) => {
-  const contractorCollaborator = projectFullData.customersInProject.find(
+  const contractorCollaborator = projectFullData.collaboratorsInProject.find(
     (cip) => cip.collaboratorType.code === "CONTRACTOR",
-  )?.customer;
+  )?.collaborator;
 
-  const plannerCollaborator = projectFullData.customersInProject.find(
+  const plannerCollaborator = projectFullData.collaboratorsInProject.find(
     (cip) => cip.collaboratorType.code === "PLANNER",
-  )?.customer;
+  )?.collaborator;
 
   return (
     <>

@@ -13,6 +13,7 @@
 ## ⚠️ O Problema
 
 O frontend está sendo desconectado quando o **access token expira** porque:
+
 1. O access token expira em 30s
 2. O frontend continua tentando usar o token expirado
 3. A API rejeita o token expirado
@@ -26,7 +27,7 @@ O frontend está sendo desconectado quando o **access token expira** porque:
 
 ```typescript
 // src/services/api.ts
-import ky, { HTTPError } from 'ky';
+import ky, { HTTPError } from "ky";
 
 interface TokenResponse {
   access_token: string;
@@ -48,9 +49,9 @@ interface AuthResponse extends TokenResponse {
 
 class ApiService {
   private api = ky.create({
-    prefixUrl: process.env.REACT_APP_API_URL || 'http://localhost:3000',
+    prefixUrl: process.env.REACT_APP_API_URL || "http://localhost:3000",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
   });
 
@@ -60,9 +61,9 @@ class ApiService {
   constructor() {
     // Criar instância com hooks para interceptar requisições e respostas
     this.api = ky.create({
-      prefixUrl: process.env.REACT_APP_API_URL || 'http://localhost:3000',
+      prefixUrl: process.env.REACT_APP_API_URL || "http://localhost:3000",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       hooks: {
         beforeRequest: [
@@ -70,7 +71,7 @@ class ApiService {
             // Adicionar token ao header antes de cada requisição
             const token = this.getAccessToken();
             if (token) {
-              request.headers.set('Authorization', `Bearer ${token}`);
+              request.headers.set("Authorization", `Bearer ${token}`);
             }
           },
         ],
@@ -86,7 +87,10 @@ class ApiService {
                 return new Promise((resolve) => {
                   this.failedQueue.push((token: string) => {
                     const retryRequest = request.clone();
-                    retryRequest.headers.set('Authorization', `Bearer ${token}`);
+                    retryRequest.headers.set(
+                      "Authorization",
+                      `Bearer ${token}`,
+                    );
                     resolve(ky(retryRequest));
                   });
                 });
@@ -99,34 +103,34 @@ class ApiService {
                 if (!refreshToken) {
                   // Sem refresh token, faz logout
                   this.clearTokens();
-                  window.location.href = '/login';
+                  window.location.href = "/login";
                   return response;
                 }
 
                 // Tenta fazer refresh
                 const newTokens = await this.refreshAccessToken(refreshToken);
-                
+
                 // Salva novos tokens
                 this.setTokens(newTokens);
 
                 // Processa fila de requisições pendentes
                 this.failedQueue.forEach((callback) =>
-                  callback(newTokens.access_token)
+                  callback(newTokens.access_token),
                 );
                 this.failedQueue = [];
 
                 // Retry da requisição original com novo token
                 const retryRequest = clonedRequest.clone();
                 retryRequest.headers.set(
-                  'Authorization',
-                  `Bearer ${newTokens.access_token}`
+                  "Authorization",
+                  `Bearer ${newTokens.access_token}`,
                 );
 
                 return ky(retryRequest);
               } catch (refreshError) {
                 // Falha ao fazer refresh, faz logout
                 this.clearTokens();
-                window.location.href = '/login';
+                window.location.href = "/login";
                 return response;
               } finally {
                 this.isRefreshing = false;
@@ -143,23 +147,27 @@ class ApiService {
   // ===== Métodos de Autenticação =====
 
   async login(email: string, password: string): Promise<AuthResponse> {
-    const response = await this.api.post('users/sessions', {
-      json: {
-        email,
-        password,
-      },
-    }).json<AuthResponse>();
+    const response = await this.api
+      .post("users/sessions", {
+        json: {
+          email,
+          password,
+        },
+      })
+      .json<AuthResponse>();
 
     this.setTokens(response);
     return response;
   }
 
   async refreshAccessToken(refreshToken: string): Promise<TokenResponse> {
-    const response = await this.api.post('users/sessions/refresh', {
-      json: {
-        refresh_token: refreshToken,
-      },
-    }).json<TokenResponse>();
+    const response = await this.api
+      .post("users/sessions/refresh", {
+        json: {
+          refresh_token: refreshToken,
+        },
+      })
+      .json<TokenResponse>();
 
     return response;
   }
@@ -167,9 +175,9 @@ class ApiService {
   async logout(): Promise<void> {
     try {
       // Opcional: notificar backend se houver endpoint de logout
-      await this.api.post('users/sessions/sign-out');
+      await this.api.post("users/sessions/sign-out");
     } catch (error) {
-      console.error('Erro ao fazer sign-out:', error);
+      console.error("Erro ao fazer sign-out:", error);
     }
     this.clearTokens();
   }
@@ -177,27 +185,33 @@ class ApiService {
   // ===== Gerenciamento de Tokens =====
 
   private setTokens(data: TokenResponse): void {
-    localStorage.setItem('access_token', data.access_token);
-    localStorage.setItem('refresh_token', data.refresh_token);
-    localStorage.setItem('access_token_expires_in', String(data.access_token_expires_in));
-    localStorage.setItem('refresh_token_expires_at', data.refresh_token_expires_at);
-    localStorage.setItem('tokens_updated_at', String(Date.now()));
+    localStorage.setItem("access_token", data.access_token);
+    localStorage.setItem("refresh_token", data.refresh_token);
+    localStorage.setItem(
+      "access_token_expires_in",
+      String(data.access_token_expires_in),
+    );
+    localStorage.setItem(
+      "refresh_token_expires_at",
+      data.refresh_token_expires_at,
+    );
+    localStorage.setItem("tokens_updated_at", String(Date.now()));
   }
 
   private getAccessToken(): string | null {
-    return localStorage.getItem('access_token');
+    return localStorage.getItem("access_token");
   }
 
   private getRefreshToken(): string | null {
-    return localStorage.getItem('refresh_token');
+    return localStorage.getItem("refresh_token");
   }
 
   private clearTokens(): void {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('access_token_expires_in');
-    localStorage.removeItem('refresh_token_expires_at');
-    localStorage.removeItem('tokens_updated_at');
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("access_token_expires_in");
+    localStorage.removeItem("refresh_token_expires_at");
+    localStorage.removeItem("tokens_updated_at");
   }
 
   isAuthenticated(): boolean {
@@ -232,9 +246,9 @@ export const apiService = new ApiService();
 
 ```typescript
 // src/hooks/useAuth.ts
-import { useContext, useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { apiService } from '../services/api';
+import { useContext, useCallback, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { apiService } from "../services/api";
 
 interface User {
   id: string;
@@ -262,7 +276,7 @@ export function useAuth(): UseAuthReturn {
       const response = await apiService.login(email, password);
       setUser(response.user || null);
     } catch (error) {
-      console.error('Erro ao fazer login:', error);
+      console.error("Erro ao fazer login:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -274,9 +288,9 @@ export function useAuth(): UseAuthReturn {
     try {
       await apiService.logout();
       setUser(null);
-      navigate('/login');
+      navigate("/login");
     } catch (error) {
-      console.error('Erro ao fazer logout:', error);
+      console.error("Erro ao fazer logout:", error);
     } finally {
       setIsLoading(false);
     }
@@ -501,7 +515,7 @@ REACT_APP_API_URL=http://localhost:3000
 ✅ **Sem interrupção UX**: Usuário não vê desconexão  
 ✅ **Fila de requisições**: Requisições pendentes aguardam novo token  
 ✅ **Segurança**: Tokens em localStorage (considere usar httpOnly cookies em produção)  
-✅ **Logout automático**: Se refresh token expirar, faz logout  
+✅ **Logout automático**: Se refresh token expirar, faz logout
 
 ---
 
@@ -511,19 +525,19 @@ Com KY, as chamadas ficam mais simples:
 
 ```typescript
 // Fazer login
-const response = await apiService.login('user@example.com', 'password');
+const response = await apiService.login("user@example.com", "password");
 
 // Fazer requisição GET
-const data = await apiService.get('/customers');
+const data = await apiService.get("/collaborators");
 
 // Fazer requisição POST
-const result = await apiService.post('/customers', { name: 'João' });
+const result = await apiService.post("/collaborators", { name: "João" });
 
 // Fazer requisição PUT
-const updated = await apiService.put('/customers/123', { name: 'Maria' });
+const updated = await apiService.put("/collaborators/123", { name: "Maria" });
 
 // Fazer requisição DELETE
-await apiService.delete('/customers/123');
+await apiService.delete("/collaborators/123");
 ```
 
 ## 🚀 Alternativa: Com TanStack Query (React Query) + Ky

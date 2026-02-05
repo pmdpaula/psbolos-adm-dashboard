@@ -9,7 +9,7 @@ export async function createCollaboration({
   collaboratorTypeCode,
   projectId,
   userId,
-  customerId,
+  collaboratorId,
 }: CollaborationDto): Promise<unknown> {
   const result = await apiClient.post(`collaborations`, {
     json: {
@@ -17,7 +17,7 @@ export async function createCollaboration({
       collaboratorTypeCode,
       projectId,
       userId,
-      customerId,
+      collaboratorId,
     },
   });
 

@@ -36,7 +36,7 @@ const manageOptions: ManageOptionsType[] = [
     description: "Gerenciar as conexões dos colaboradores com o projeto.",
     url: "/projects/id/connect",
     iconName: "person_outline",
-    count: "customersInProject",
+    count: "collaboratorsInProject",
   },
   {
     title: "Bolos",

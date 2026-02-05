@@ -12,7 +12,7 @@ export async function fetchCollaboratorsByProjectId(
   projectId: string,
 ): Promise<fetchCollaboratorsByProjectIdResponse> {
   const result = await apiClient
-    .get(`collaborations/customers/${projectId}`)
+    .get(`collaborations/collaborators/${projectId}`)
     .json<fetchCollaboratorsByProjectIdResponse>();
 
   return result;

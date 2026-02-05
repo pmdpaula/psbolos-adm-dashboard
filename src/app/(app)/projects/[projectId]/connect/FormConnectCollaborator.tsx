@@ -63,16 +63,15 @@ interface FormConnectCollaboratorProps {
 export const fetchCollaborationsInProject = async (projectId: string) => {
   const projectFullDataInDb = await getProjectFullDataByIdAction(projectId);
 
-  const collaborationsInProject = projectFullDataInDb.customersInProject.map(
-    (collaboration) => ({
-      customerId: collaboration.customer.id!,
+  const collaborationsInProject =
+    projectFullDataInDb.collaboratorsInProject.map((collaboration) => ({
+      collaboratorId: collaboration.collaborator.id!,
       collaboratorType: collaboration.collaboratorType,
       projectId,
       collaborationId: collaboration.id,
       role: collaboration.role ?? null,
-      customer: collaboration.customer,
-    }),
-  );
+      collaborator: collaboration.collaborator,
+    }));
 
   const collaborationsInProjectSorted = collaborationsInProject.sort((a, b) =>
     a.collaboratorType.name.localeCompare(b.collaboratorType.name),
@@ -94,9 +93,8 @@ export const FormConnectCollaborator = ({
     useProjectContext();
   const [isReadingData, setIsReadingData] = useState(true);
 
-  const [customersOutsideProject, setCustomersOutsideProject] = useState<
-    CollaboratorDto[]
-  >([]);
+  const [collaboratorsOutsideProject, setCollaboratorsOutsideProject] =
+    useState<CollaboratorDto[]>([]);
 
   const [contractorTypeName, setContractorTypeName] = useState<string>("");
 
@@ -111,7 +109,7 @@ export const FormConnectCollaborator = ({
     });
 
   const { data: collaboratorsData } = useQuery({
-    queryKey: ["customers"],
+    queryKey: ["collaborators"],
     queryFn: async () => await fetchCollaborators(),
   });
 
@@ -145,15 +143,15 @@ export const FormConnectCollaborator = ({
 
     getProjectFullDataByIdAction(projectId).then((projectFullData) => {
       const collaboratorsInProjectIds =
-        projectFullData.customersInProject.map(
-          (collaboration) => collaboration.customer.id,
+        projectFullData.collaboratorsInProject.map(
+          (collaboration) => collaboration.collaborator.id,
         ) ?? [];
 
-      const collaboratorsOutside = collaboratorsData.customers.filter(
-        (customer) => !collaboratorsInProjectIds.includes(customer.id!),
+      const collaboratorsOutside = collaboratorsData.collaborators.filter(
+        (collaborator) => !collaboratorsInProjectIds.includes(collaborator.id!),
       );
 
-      setCustomersOutsideProject(collaboratorsOutside);
+      setCollaboratorsOutsideProject(collaboratorsOutside);
     });
 
     setIsReadingData(false);
@@ -173,13 +171,13 @@ export const FormConnectCollaborator = ({
 
   useEffect(() => {
     if (!openForm) {
-      // Refresh react-query data so Autocomplete gets the latest customers
-      queryClient.invalidateQueries({ queryKey: ["customers"] });
+      // Refresh react-query data so Autocomplete gets the latest collaborators
+      queryClient.invalidateQueries({ queryKey: ["collaborators"] });
 
       // Also refresh any server components if present
       router.refresh();
-      setFocusOnCustomerSelect();
-      // TODO finalizar teste com a focus do campo customerId
+      setFocusOnCollaboratorSelect();
+      // TODO finalizar teste com a focus do campo collaboratorId
     }
   }, [openForm, queryClient]);
 
@@ -198,7 +196,7 @@ export const FormConnectCollaborator = ({
     reset,
   } = useForm<CollaborationForm>({
     defaultValues: {
-      customerId: "",
+      collaboratorId: "",
       collaboratorTypeCode: "",
     },
     resolver: zodResolver(collaborationFormSchema),
@@ -215,7 +213,7 @@ export const FormConnectCollaborator = ({
 
     if (!isThereContractorInProject) {
       reset({
-        customerId: "",
+        collaboratorId: "",
         collaboratorTypeCode: "",
       });
     }
@@ -232,11 +230,11 @@ export const FormConnectCollaborator = ({
     }
   };
 
-  function setFocusOnCustomerSelect() {
-    const customerSelect = document.getElementById("customerId");
+  function setFocusOnCollaboratorSelect() {
+    const collaboratorSelect = document.getElementById("collaboratorId");
 
-    if (customerSelect) {
-      customerSelect.focus();
+    if (collaboratorSelect) {
+      collaboratorSelect.focus();
     }
   }
 
@@ -274,39 +272,43 @@ export const FormConnectCollaborator = ({
                 sx={{ mb: 2 }}
               >
                 <Controller
-                  name="customerId"
+                  name="collaboratorId"
                   control={control}
                   rules={{ required: true }}
                   render={({ field }) => (
                     <FormControl
                       sx={{ minWidth: 240, flexGrow: 1 }}
-                      error={errors.customerId ? true : false}
-                      color={errors.customerId ? "error" : "secondary"}
+                      error={errors.collaboratorId ? true : false}
+                      color={errors.collaboratorId ? "error" : "secondary"}
                     >
                       <Autocomplete
                         clearOnEscape
                         filterOptions={filterOptions}
-                        options={customersOutsideProject.map((customer) => ({
-                          label: customer.name,
-                          id: customer.id!,
-                          contact:
-                            customer.contact1 && customer.contact2
-                              ? customer.contact1 +
-                                " \u26AB " +
-                                customer.contact2
-                              : customer.contact1
-                                ? customer.contact1
-                                : customer.contact2
-                                  ? customer.contact2
-                                  : "",
-                        }))}
+                        options={collaboratorsOutsideProject.map(
+                          (collaborator) => ({
+                            label: collaborator.name,
+                            id: collaborator.id!,
+                            contact:
+                              collaborator.contact1 && collaborator.contact2
+                                ? collaborator.contact1 +
+                                  " \u26AB " +
+                                  collaborator.contact2
+                                : collaborator.contact1
+                                  ? collaborator.contact1
+                                  : collaborator.contact2
+                                    ? collaborator.contact2
+                                    : "",
+                          }),
+                        )}
                         value={
-                          customersOutsideProject
-                            .map((customer) => ({
-                              label: customer.name,
-                              id: customer.id!,
+                          collaboratorsOutsideProject
+                            .map((collaborator) => ({
+                              label: collaborator.name,
+                              id: collaborator.id!,
                               contact:
-                                customer.contact1 + " " + customer.contact2,
+                                collaborator.contact1 +
+                                " " +
+                                collaborator.contact2,
                             }))
                             .find((opt) => opt.id === field.value) ?? null
                         }
@@ -348,17 +350,17 @@ export const FormConnectCollaborator = ({
                             size="small"
                             sx={{
                               flexGrow: 1,
-                              boxShadow: errors.customerId
+                              boxShadow: errors.collaboratorId
                                 ? "0px 0px 12px 2px rgba(255,0,0,0.5)"
                                 : "",
                             }}
-                            error={Boolean(errors.customerId)}
+                            error={Boolean(errors.collaboratorId)}
                           />
                         )}
                       />
 
                       <StyledFormHelperText component="p">
-                        {errors.customerId?.message}
+                        {errors.collaboratorId?.message}
                       </StyledFormHelperText>
                     </FormControl>
                   )}

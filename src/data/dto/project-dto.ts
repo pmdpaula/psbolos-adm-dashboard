@@ -134,12 +134,12 @@ export const projectFullDataDtoSchema = z.object({
   state: z.string().nullable(),
   status: projectStatusDtoSchema,
 
-  customersInProject: z.array(
+  collaboratorsInProject: z.array(
     z.object({
       id: z.cuid2(),
       role: z.string(),
       collaboratorType: collaboratorTypeDtoSchema,
-      customer: collaboratorDtoSchema,
+      collaborator: collaboratorDtoSchema,
     }),
   ),
   cakes: z.array(

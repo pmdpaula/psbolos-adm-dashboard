@@ -18,7 +18,7 @@ export async function editCollaborator({
   zipCode,
   country,
 }: CollaboratorDto): Promise<unknown> {
-  const result = await apiClient.put(`customers/${id}`, {
+  const result = await apiClient.put(`collaborators/${id}`, {
     json: {
       name,
       registerNumber,

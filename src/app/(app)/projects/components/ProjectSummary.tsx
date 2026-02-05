@@ -47,22 +47,24 @@ export const ProjectSummary = ({ projectFullData }: ProjectSummaryProps) => {
 
   function getContractors(): { collaborators: string[]; type: string } {
     if (
-      !projectFullData.customersInProject ||
-      projectFullData.customersInProject.length === 0
+      !projectFullData.collaboratorsInProject ||
+      projectFullData.collaboratorsInProject.length === 0
     ) {
       return { collaborators: [], type: "" };
     }
 
-    const contractorNames = projectFullData.customersInProject
-      .filter((customer) => customer.collaboratorType.code === "CONTRACTOR")
-      .map((customer) => customer.customer.name);
+    const contractorNames = projectFullData.collaboratorsInProject
+      .filter(
+        (collaborator) => collaborator.collaboratorType.code === "CONTRACTOR",
+      )
+      .map((collaborator) => collaborator.collaborator.name);
 
     if (contractorNames.length === 0) {
       return { collaborators: [], type: "" };
     }
 
-    const typeName = projectFullData.customersInProject.find(
-      (customer) => customer.collaboratorType.code === "CONTRACTOR",
+    const typeName = projectFullData.collaboratorsInProject.find(
+      (collaborator) => collaborator.collaboratorType.code === "CONTRACTOR",
     )!.collaboratorType.name;
 
     return { collaborators: contractorNames, type: typeName };
@@ -70,22 +72,24 @@ export const ProjectSummary = ({ projectFullData }: ProjectSummaryProps) => {
 
   function getPlanners(): { collaborators: string[]; type: string } {
     if (
-      !projectFullData.customersInProject ||
-      projectFullData.customersInProject.length === 0
+      !projectFullData.collaboratorsInProject ||
+      projectFullData.collaboratorsInProject.length === 0
     ) {
       return { collaborators: [], type: "" };
     }
 
-    const plannerNames = projectFullData.customersInProject
-      .filter((customer) => customer.collaboratorType.code === "PLANNER")
-      .map((customer) => customer.customer.name);
+    const plannerNames = projectFullData.collaboratorsInProject
+      .filter(
+        (collaborator) => collaborator.collaboratorType.code === "PLANNER",
+      )
+      .map((collaborator) => collaborator.collaborator.name);
 
     if (plannerNames.length === 0) {
       return { collaborators: [], type: "" };
     }
 
-    const typeName = projectFullData.customersInProject.find(
-      (customer) => customer.collaboratorType.code === "PLANNER",
+    const typeName = projectFullData.collaboratorsInProject.find(
+      (collaborator) => collaborator.collaboratorType.code === "PLANNER",
     )!.collaboratorType.name;
 
     return { collaborators: plannerNames, type: typeName };

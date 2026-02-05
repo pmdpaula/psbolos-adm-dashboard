@@ -35,7 +35,8 @@ export async function getCollaboratorByProjectIdAction(projectId: string) {
 }
 
 export async function createCollaborationAction(data: CollaborationDto) {
-  const { role, collaboratorTypeCode, projectId, userId, customerId } = data;
+  const { role, collaboratorTypeCode, projectId, userId, collaboratorId } =
+    data;
 
   try {
     await createCollaboration({
@@ -43,7 +44,7 @@ export async function createCollaborationAction(data: CollaborationDto) {
       collaboratorTypeCode,
       projectId,
       userId,
-      customerId,
+      collaboratorId,
     });
   } catch (error) {
     if (error instanceof HTTPError) {

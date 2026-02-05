@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-export const customerContactTypeDtoSchema = z.enum([
+export const collaboratorContactTypeDtoSchema = z.enum([
   "EMAIL",
   "PHONE",
   "WHATSAPP",
@@ -10,6 +10,6 @@ export const customerContactTypeDtoSchema = z.enum([
   "OTHER",
 ]);
 
-export type CustomerContactTypeDto = z.infer<
-  typeof customerContactTypeDtoSchema
+export type CollaboratorContactTypeDto = z.infer<
+  typeof collaboratorContactTypeDtoSchema
 >;

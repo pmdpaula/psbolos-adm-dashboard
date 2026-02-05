@@ -225,7 +225,7 @@ export const AlreadyConnectedCollaborators = ({
                           variant="body1"
                           sx={{ marginRight: 2 }}
                         >
-                          {collaboration.customer!.name}
+                          {collaboration.collaborator!.name}
                         </Typography>
                         {/* </Link> */}
                         <Chip
