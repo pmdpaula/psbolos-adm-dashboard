@@ -14,9 +14,7 @@ export const createCakeDtoSchema = z.object({
       }
       return val;
     },
-    z
-      .number({ error: "O número de fatias deve ser um número." })
-      .min(1, { error: "O número de fatias deve ser no mínimo 1." }),
+    z.number({ error: "O número de fatias deve ser um número." }).optional(),
   ),
 
   tiers: z.preprocess(
@@ -47,70 +45,43 @@ export const createCakeDtoSchema = z.object({
 
   // referenceUrl: z.url().nullable().optional(),
 
-  batterCode: z.preprocess(
-    (val) => {
-      if (val === "") {
-        return {
-          error: "A massa é obrigatória e deve ser uma das opções possíveis.",
-        };
-      }
-      return val;
-    },
-    z.string({
+  batterCode: z
+    .string({
       error: "A massa é obrigatória e deve ser uma das opções possíveis.",
+    })
+    .min(1, {
+      message: "A massa é obrigatória e deve ser uma das opções possíveis.",
     }),
-  ),
 
-  fillingCode1: z.preprocess(
-    (val) => {
-      if (val === "") {
-        return {
-          error:
-            "O recheio 1 é obrigatório e deve ser uma das opções possíveis.",
-        };
-      }
-      return val;
-    },
-    z.string({
+  fillingCode1: z
+    .string({
       error: "O recheio 1 é obrigatório e deve ser uma das opções possíveis.",
+    })
+    .min(1, {
+      message: "O recheio 1 é obrigatório e deve ser uma das opções possíveis.",
     }),
-  ),
 
-  fillingCode2: z.preprocess(
-    (val) => {
-      if (val === "") {
-        return {
-          error:
-            "O recheio 2 é obrigatório e deve ser uma das opções possíveis.",
-        };
-      }
-      return val;
-    },
-    z.string({
+  fillingCode2: z
+    .string({
       error: "O recheio 2 é obrigatório e deve ser uma das opções possíveis.",
+    })
+    .min(1, {
+      message: "O recheio 2 é obrigatório e deve ser uma das opções possíveis.",
     }),
-  ),
 
-  fillingCode3: z.preprocess(
-    (val) => {
-      if (val === "") {
-        return {
-          error:
-            "O recheio 3 é obrigatório e deve ser uma das opções possíveis.",
-        };
-      }
-      return val;
-    },
-    z.string({
+  fillingCode3: z
+    .string({
       error: "O recheio 3 é obrigatório e deve ser uma das opções possíveis.",
+    })
+    .min(1, {
+      message: "O recheio 3 é obrigatório e deve ser uma das opções possíveis.",
     }),
-  ),
 });
 
 export type CreateCakeDto = z.infer<typeof createCakeDtoSchema>;
 
 export const cakeDtoSchema = z.object({
-  id: z.cuid2(),
+  id: z.cuid2().optional(),
   ...createCakeDtoSchema.shape,
 });
 

@@ -65,6 +65,7 @@ export const FormAddCakeToProject = ({
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors, isLoading },
   } = useForm<CreateCakeDto>({
     defaultValues: {
@@ -72,7 +73,7 @@ export const FormAddCakeToProject = ({
       description: "",
       price: 0,
       tiers: 1,
-      slices: 1,
+      slices: 0,
       // imageUrl: null,
       // referenceUrl: null,
       batterCode: "",
@@ -111,8 +112,6 @@ export const FormAddCakeToProject = ({
 
     const submitResponse = await addCakeToProjectAction(submitData);
 
-    // setOpenForm(false);
-
     setOpenAlertSnackBar({
       isOpen: true,
       success: submitResponse.success,
@@ -121,6 +120,9 @@ export const FormAddCakeToProject = ({
     });
 
     if (submitResponse.success) {
+      // clear form
+      reset();
+
       setRefreshKey((k) => k + 1);
     }
   };
@@ -137,7 +139,10 @@ export const FormAddCakeToProject = ({
       {!isLoading && (
         <GradientPaper label="Adicionar novo bolo ao projeto">
           <form onSubmit={handleSubmit(onSubmit)}>
-            <Stack spacing={2}>
+            <Stack
+              spacing={2}
+              mt={3}
+            >
               <Controller
                 name="description"
                 control={control}

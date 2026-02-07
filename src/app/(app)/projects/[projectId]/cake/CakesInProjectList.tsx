@@ -29,12 +29,20 @@ import type { CakeDto } from "@/data/dto/cake-dto";
 import { useProjectContext } from "../../ProjectContext";
 import { fetchCakesByProjectIdAction, removeCakeAction } from "./actions";
 
+// TODO: Criar a opções de editar o bolo
+
 interface CakesInProjectListProps {
   projectId: string;
+  formMode: "add" | "edit";
+  setFormMode: React.Dispatch<React.SetStateAction<"add" | "edit">>;
+  setCakeToEdit: React.Dispatch<React.SetStateAction<CakeDto | null>>;
 }
 
 export const CakesInProjectList = ({
   projectId,
+  // formMode,
+  setFormMode,
+  setCakeToEdit,
 }: CakesInProjectListProps) => {
   const { setRefreshKey } = useProjectContext();
   const { setOpenAlertSnackBar } = useMainContext();
@@ -90,21 +98,10 @@ export const CakesInProjectList = ({
     setRefreshKey((prevKey) => prevKey + 1);
   }
 
-  // function handleCloseAlert(
-  //   event?: React.SyntheticEvent | Event,
-  //   reason?: SnackbarCloseReason,
-  // ) {
-  //   if (reason === "clickaway") {
-  //     return;
-  //   }
-
-  //   setOpenAlertSnackBar({
-  //     isOpen: false,
-  //     success: true,
-  //     message: "",
-  //     errorCode: null,
-  //   });
-  // }
+  const handleEditCake = (cake: CakeDto) => {
+    setCakeToEdit(cake);
+    setFormMode("edit");
+  };
 
   async function fetchCakesInProject(projectId: string): Promise<CakeDto[]> {
     setIsReadingData(true);
@@ -200,7 +197,8 @@ export const CakesInProjectList = ({
                         <Icon
                           color="warning"
                           fontSize="large"
-                          sx={{ marginRight: 1.5 }}
+                          sx={{ marginRight: 1.5, cursor: "pointer" }}
+                          onClick={() => handleEditCake(cake)}
                         >
                           edit_note
                         </Icon>
@@ -216,11 +214,13 @@ export const CakesInProjectList = ({
 
                       <Chip
                         label={
-                          cake.slices > 1 ? `${cake.slices} fatias` : "1 fatia"
+                          cake.slices && cake.slices > 1
+                            ? `${cake.slices} fatias`
+                            : "sem fatia"
                         }
                         color="secondary"
                         size="small"
-                        sx={{ margin: 0, fontSize: 10 }}
+                        sx={{ margin: 0, fontSize: 10, fontWeight: "bold" }}
                       />
 
                       <Typography
@@ -242,7 +242,7 @@ export const CakesInProjectList = ({
                           } else {
                             setCakesToDisconnect([
                               ...cakesToDisconnect,
-                              cake.id,
+                              cake.id!,
                             ]);
                           }
                         }}

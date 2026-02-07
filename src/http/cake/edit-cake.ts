@@ -6,9 +6,11 @@ import { apiClient } from "../api-client";
 
 export async function editCake({
   id,
+  projectId,
   description,
   price,
   tiers,
+  slices,
   // imageUrl,
   // referenceUrl,
   batterCode,
@@ -16,11 +18,12 @@ export async function editCake({
   fillingCode2,
   fillingCode3,
 }: CakeDto): Promise<unknown> {
-  const result = await apiClient.put(`cakes/${id}`, {
+  const result = await apiClient.put(`projects/${projectId}/cakes/${id}`, {
     json: {
       description,
       price,
       tiers,
+      slices,
       // imageUrl,
       // referenceUrl,
       batterCode,

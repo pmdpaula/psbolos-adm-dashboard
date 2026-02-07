@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import BackspaceIcon from "@mui/icons-material/Backspace";
 import SaveIcon from "@mui/icons-material/Save";
 import {
   Backdrop,
@@ -12,6 +13,7 @@ import {
   MenuItem,
   Select,
   Stack,
+  useMediaQuery,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -31,17 +33,24 @@ import { getCakeBatters } from "@/http/data-types/get-cake-batters";
 import { getCakeFillings } from "@/http/data-types/get-cake-fillings";
 
 import { useProjectContext } from "../../ProjectContext";
-import { addCakeToProjectAction } from "./actions";
+import { editCakeInProjectAction } from "./actions";
 
 const typedResolver = zodResolver(cakeDtoSchema) as Resolver<CakeDto>;
 
 interface FormEditCakeToProjectProps {
   cake: CakeDto;
+  setFormMode: React.Dispatch<React.SetStateAction<"add" | "edit">>;
+  setCakeToEdit: React.Dispatch<React.SetStateAction<CakeDto | null>>;
 }
 
-export const FormEditCakeToProject = ({ cake }: FormEditCakeToProjectProps) => {
+export const FormEditCakeToProject = ({
+  cake,
+  setFormMode,
+  setCakeToEdit,
+}: FormEditCakeToProjectProps) => {
   const { setOpenAlertSnackBar } = useMainContext();
   const { setRefreshKey } = useProjectContext();
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 
   const { data: cakeBattersData, isLoading: isLoadingCakeBatters } = useQuery({
     queryKey: ["cake-batters"],
@@ -65,7 +74,7 @@ export const FormEditCakeToProject = ({ cake }: FormEditCakeToProjectProps) => {
       description: cake.description,
       price: cake.price,
       tiers: cake.tiers,
-      slices: cake.slices,
+      slices: cake.slices || 0,
       // imageUrl: null,
       // referenceUrl: null,
       batterCode: cake.batterCode,
@@ -76,7 +85,6 @@ export const FormEditCakeToProject = ({ cake }: FormEditCakeToProjectProps) => {
     resolver: typedResolver,
     mode: "onChange", // Valida onChange + onBlur
   });
-
   const [isButtonDisabled, setIsButtonDisabled] = useState(isLoading);
   const [isReadingData, setIsReadingData] = useState(true);
 
@@ -99,12 +107,16 @@ export const FormEditCakeToProject = ({ cake }: FormEditCakeToProjectProps) => {
     setIsButtonDisabled(isReadingData);
   }, [isLoading, isLoadingCakeBatters, isLoadingCakeFillings, isReadingData]);
 
+  const handleCancelEdition = () => {
+    setFormMode("add");
+    setCakeToEdit(null);
+  };
+
   const onSubmit: SubmitHandler<CakeDto> = async (data) => {
-    const submitData = { ...data, projectId: cake.projectId };
+    const submitData = { ...data, id: cake.id, projectId: cake.projectId };
+    const submitResponse = await editCakeInProjectAction(submitData);
 
-    const submitResponse = await addCakeToProjectAction(submitData);
-
-    // setOpenForm(false);
+    handleCancelEdition();
 
     setOpenAlertSnackBar({
       isOpen: true,
@@ -128,9 +140,12 @@ export const FormEditCakeToProject = ({ cake }: FormEditCakeToProjectProps) => {
       </Backdrop>
 
       {!isLoading && (
-        <GradientPaper label="Adicionar novo bolo ao projeto">
+        <GradientPaper label={`Editar: ${cake.description}`}>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <Stack spacing={2}>
+            <Stack
+              spacing={2}
+              mt={3}
+            >
               <Controller
                 name="description"
                 control={control}
@@ -533,13 +548,31 @@ export const FormEditCakeToProject = ({ cake }: FormEditCakeToProjectProps) => {
               /> */}
             </Stack>
 
+            <Stack
+              direction={isMobile ? "column" : "row"}
+              spacing={2}
+              mt={4}
+            >
+              <Button
+                variant="outlined"
+                color="error"
+                fullWidth={isMobile}
+                size="large"
+                sx={{ mt: 5, height: 42, minWidth: 160 }}
+                disabled={isButtonDisabled}
+                startIcon={<BackspaceIcon fontSize="small" />}
+                onClick={() => handleCancelEdition()}
+              >
+                Cancelar edição
+              </Button>
+
               <Button
                 type="submit"
                 variant="contained"
                 color="secondary"
-                fullWidth
+                fullWidth={isMobile}
                 size="large"
-              sx={{ mt: 5, height: 42 }}
+                sx={{ mt: 5, height: 42, flexGrow: 1, minWidth: 160 }}
                 disabled={isButtonDisabled}
                 startIcon={
                   isLoading ? (
@@ -551,6 +584,7 @@ export const FormEditCakeToProject = ({ cake }: FormEditCakeToProjectProps) => {
               >
                 Salvar
               </Button>
+            </Stack>
           </form>
         </GradientPaper>
       )}
