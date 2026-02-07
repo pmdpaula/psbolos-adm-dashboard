@@ -7,6 +7,18 @@ export const createCakeDtoSchema = z.object({
     error: "A descrição é obrigatória. Mínimo de 6 caracteres.",
   }),
 
+  slices: z.preprocess(
+    (val) => {
+      if (typeof val === "string") {
+        return parseInt(val);
+      }
+      return val;
+    },
+    z
+      .number({ error: "O número de fatias deve ser um número." })
+      .min(1, { error: "O número de fatias deve ser no mínimo 1." }),
+  ),
+
   tiers: z.preprocess(
     (val) => {
       if (typeof val === "string") {

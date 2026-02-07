@@ -33,6 +33,9 @@ import { getCakeFillings } from "@/http/data-types/get-cake-fillings";
 import { useProjectContext } from "../../ProjectContext";
 import { addCakeToProjectAction } from "./actions";
 
+// TODO: adicionar upload de imagens para bolo pronto e bolo de referência
+// TODO: adicionar opção de editar o bolos na listagem de bolos do projeto
+
 const typedResolver = zodResolver(
   createCakeDtoSchema,
 ) as Resolver<CreateCakeDto>;
@@ -69,6 +72,7 @@ export const FormAddCakeToProject = ({
       description: "",
       price: 0,
       tiers: 1,
+      slices: 1,
       // imageUrl: null,
       // referenceUrl: null,
       batterCode: "",
@@ -233,6 +237,40 @@ export const FormAddCakeToProject = ({
 
                     <StyledFormHelperText component="p">
                       {errors.tiers?.message}
+                    </StyledFormHelperText>
+                  </FormControl>
+                )}
+              />
+
+              <Controller
+                name="slices"
+                control={control}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <FormControl
+                    fullWidth
+                    error={errors.slices ? true : false}
+                    color={errors.slices ? "error" : "secondary"}
+                  >
+                    <InputLabel
+                      size="small"
+                      htmlFor="slices"
+                    >
+                      Fatias
+                    </InputLabel>
+
+                    <StyledOutlinedInput
+                      size="small"
+                      id="slices"
+                      label="Fatias"
+                      type="number"
+                      {...field}
+                      // value={field.value}
+                      error={errors.slices ? true : false}
+                    />
+
+                    <StyledFormHelperText component="p">
+                      {errors.slices?.message}
                     </StyledFormHelperText>
                   </FormControl>
                 )}

@@ -34,8 +34,6 @@ interface CakesInProjectListProps {
 }
 
 export const CakesInProjectList = ({
-  // cakes,
-  // setCakes,
   projectId,
 }: CakesInProjectListProps) => {
   const { setRefreshKey } = useProjectContext();
@@ -43,7 +41,6 @@ export const CakesInProjectList = ({
   const theme = useTheme();
   const isBreakpointMinusMd = useMediaQuery(theme.breakpoints.up("sm"));
 
-  // const [project, setProject] = useState<ProjectFullDataDto | null>(null);
   const [cakes, setCakes] = useState<CakeDto[]>([]);
   const [isReadingData, setIsReadingData] = useState(true);
 
@@ -219,7 +216,7 @@ export const CakesInProjectList = ({
 
                       <Chip
                         label={
-                          cake.tiers > 1 ? `${cake.tiers} andares` : "1 andar"
+                          cake.slices > 1 ? `${cake.slices} fatias` : "1 fatia"
                         }
                         color="secondary"
                         size="small"

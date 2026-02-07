@@ -65,6 +65,7 @@ export const FormEditCakeToProject = ({ cake }: FormEditCakeToProjectProps) => {
       description: cake.description,
       price: cake.price,
       tiers: cake.tiers,
+      slices: cake.slices,
       // imageUrl: null,
       // referenceUrl: null,
       batterCode: cake.batterCode,
@@ -229,6 +230,40 @@ export const FormEditCakeToProject = ({ cake }: FormEditCakeToProjectProps) => {
 
                     <StyledFormHelperText component="p">
                       {errors.tiers?.message}
+                    </StyledFormHelperText>
+                  </FormControl>
+                )}
+              />
+
+              <Controller
+                name="slices"
+                control={control}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <FormControl
+                    fullWidth
+                    error={errors.slices ? true : false}
+                    color={errors.slices ? "error" : "secondary"}
+                  >
+                    <InputLabel
+                      size="small"
+                      htmlFor="slices"
+                    >
+                      Fatias
+                    </InputLabel>
+
+                    <StyledOutlinedInput
+                      size="small"
+                      id="slices"
+                      label="Fatias"
+                      type="number"
+                      {...field}
+                      value={field.value}
+                      error={errors.slices ? true : false}
+                    />
+
+                    <StyledFormHelperText component="p">
+                      {errors.slices?.message}
                     </StyledFormHelperText>
                   </FormControl>
                 )}
@@ -498,24 +533,24 @@ export const FormEditCakeToProject = ({ cake }: FormEditCakeToProjectProps) => {
               /> */}
             </Stack>
 
-            <Button
-              type="submit"
-              variant="contained"
-              color="secondary"
-              fullWidth
-              size="large"
+              <Button
+                type="submit"
+                variant="contained"
+                color="secondary"
+                fullWidth
+                size="large"
               sx={{ mt: 5, height: 42 }}
-              disabled={isButtonDisabled}
-              startIcon={
-                isLoading ? (
-                  <CircularProgress size={24} />
-                ) : (
-                  <SaveIcon fontSize="small" />
-                )
-              }
-            >
-              Salvar
-            </Button>
+                disabled={isButtonDisabled}
+                startIcon={
+                  isLoading ? (
+                    <CircularProgress size={24} />
+                  ) : (
+                    <SaveIcon fontSize="small" />
+                  )
+                }
+              >
+                Salvar
+              </Button>
           </form>
         </GradientPaper>
       )}

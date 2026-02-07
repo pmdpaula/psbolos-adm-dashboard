@@ -22,6 +22,7 @@ export async function addCakeToProjectAction(cake: CreateCakeDto) {
       description: cake.description,
       price: cake.price,
       tiers: cake.tiers,
+      slices: cake.slices,
       // imageUrl: cake.imageUrl,
       // referenceUrl: cake.referenceUrl,
       batterCode: cake.batterCode,
