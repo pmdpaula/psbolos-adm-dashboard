@@ -82,6 +82,7 @@ export const FormCreateProject = () => {
       eventTypeCode: eventTypeSelected,
       eventDate: new Date().toLocaleDateString("pt-BR"),
       localName: null,
+      paymentMethod: null,
       deliveryModeCode: deliveryModeSelected,
       address: null,
       city: "Rio de Janeiro",
@@ -95,36 +96,6 @@ export const FormCreateProject = () => {
   });
 
   const [isReadingData, setIsReadingData] = useState(true);
-
-  // function handleChangeEventType(event: SelectChangeEvent<string>) {
-  //   const selectedType = event.target.value as string;
-
-  //   if (!selectedType) {
-  //     setValue("eventTypeCode", "");
-  //   } else {
-  //     setValue("eventTypeCode", selectedType);
-  //   }
-  // }
-
-  // function handleChangeDeliveryMode(event: SelectChangeEvent<string>) {
-  //   const selectedType = event.target.value as string;
-
-  //   if (!selectedType) {
-  //     setValue("deliveryModeCode", "");
-  //   } else {
-  //     setValue("deliveryModeCode", selectedType);
-  //   }
-  // }
-
-  // function handleChangeProjectStatus(event: SelectChangeEvent<string>) {
-  //   const selectedType = event.target.value as string;
-
-  //   if (!selectedType) {
-  //     setValue("statusCode", "");
-  //   } else {
-  //     setValue("statusCode", selectedType);
-  //   }
-  // }
 
   const [isButtonDisabled, setIsButtonDisabled] = useState(isLoading);
 
@@ -176,7 +147,7 @@ export const FormCreateProject = () => {
 
       setCookie("newProject", JSON.stringify(createdProject), {
         path: "/",
-        maxAge: 60 * 60 * 24 * 5, // 5 days
+        maxAge: 60 * 60 * 24 * 7, // 7 days
       });
     } else {
       setIsButtonDisabled(false);
@@ -382,11 +353,13 @@ export const FormCreateProject = () => {
                   >
                     Data do Evento
                   </InputLabel>
+
                   <StyledOutlinedInput
                     size="small"
                     id="eventDate"
                     type="date"
-                    placeholder=""
+                    label="Data do Evento"
+                    // placeholder=""
                     {...field}
                     value={field.value || ""}
                     error={errors.eventDate ? true : false}
@@ -417,8 +390,8 @@ export const FormCreateProject = () => {
 
                   <StyledOutlinedInput
                     size="small"
-                    id="registerNumber"
-                    label="CPF/CNPJ"
+                    id="localName"
+                    label="Local do Evento"
                     {...field}
                     value={field.value || ""}
                     error={errors.localName ? true : false}
@@ -426,6 +399,38 @@ export const FormCreateProject = () => {
 
                   <StyledFormHelperText component="p">
                     {errors.localName?.message}
+                  </StyledFormHelperText>
+                </FormControl>
+              )}
+            />
+
+            <Controller
+              name="paymentMethod"
+              control={control}
+              render={({ field }) => (
+                <FormControl
+                  fullWidth
+                  error={errors.paymentMethod ? true : false}
+                  color={errors.paymentMethod ? "error" : "secondary"}
+                >
+                  <InputLabel
+                    size="small"
+                    htmlFor="paymentMethod"
+                  >
+                    Forma de Pagamento
+                  </InputLabel>
+
+                  <StyledOutlinedInput
+                    size="small"
+                    id="paymentMethod"
+                    label="Forma de Pagamento"
+                    {...field}
+                    value={field.value || ""}
+                    error={errors.paymentMethod ? true : false}
+                  />
+
+                  <StyledFormHelperText component="p">
+                    {errors.paymentMethod?.message}
                   </StyledFormHelperText>
                 </FormControl>
               )}
@@ -561,6 +566,7 @@ export const FormCreateProject = () => {
                   >
                     Estado
                   </InputLabel>
+
                   <StyledOutlinedInput
                     size="small"
                     id="state"

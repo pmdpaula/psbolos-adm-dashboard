@@ -2,12 +2,12 @@ import * as z from "zod";
 
 import { eventTypeDtoSchema } from "@/data/dto/data-types/event-type-dto";
 
+import { cakeDtoSchema } from "./cake-dto";
 import { collaboratorDtoSchema } from "./collaborator-dto";
-import { cakeBatterDtoSchema } from "./data-types/cake-batter-dto";
-import { cakeFillingDtoSchema } from "./data-types/cake-filling-dto";
 import { collaboratorTypeDtoSchema } from "./data-types/collaborator-type-dto";
 import { deliveryModeDtoSchema } from "./data-types/delivery-mode-dto";
 import { projectStatusDtoSchema } from "./data-types/project-status-dto";
+import { paymentDtoSchema } from "./payment-dto";
 
 // export const createProjectDtoSchema = z.object({
 //   name: z
@@ -109,12 +109,14 @@ export const createProjectDtoSchema = z.object({
   statusCode: z.string({
     message: "O status é obrigatório e deve ser uma das opções possíveis.",
   }),
+
+  paymentMethod: z.string().optional().nullable(),
 });
 
 export type CreateProjectDto = z.infer<typeof createProjectDtoSchema>;
 
 export const projectDtoSchema = z.object({
-  id: z.cuid2(),
+  id: z.cuid2().optional(),
   ...createProjectDtoSchema.shape,
 });
 
@@ -133,6 +135,7 @@ export const projectFullDataDtoSchema = z.object({
   city: z.string().nullable(),
   state: z.string().nullable(),
   status: projectStatusDtoSchema,
+  paymentMethod: z.string().nullable().or(z.literal("")),
 
   collaboratorsInProject: z.array(
     z.object({
@@ -143,28 +146,30 @@ export const projectFullDataDtoSchema = z.object({
     }),
   ),
   cakes: z.array(
-    z.object({
-      id: z.cuid2(),
-      description: z.string(),
-      tiers: z.number(),
-      price: z.number(),
-      imageUrl: z.url().nullable().optional(),
-      referenceUrl: z.url().nullable().optional(),
-      batter: cakeBatterDtoSchema,
-      filling1: cakeFillingDtoSchema,
-      filling2: cakeFillingDtoSchema,
-      filling3: cakeFillingDtoSchema,
-      projectId: z.cuid2(),
-    }),
+    cakeDtoSchema,
+    // z.object({
+    //   id: z.cuid2(),
+    //   description: z.string(),
+    //   tiers: z.number(),
+    //   price: z.number(),
+    //   imageUrl: z.url().nullable().optional(),
+    //   referenceUrl: z.url().nullable().optional(),
+    //   batterCode: z.string(),
+    //   filling1Code: z.string(),
+    //   filling2Code: z.string(),
+    //   filling3Code: z.string(),
+    //   projectId: z.cuid2(),
+    // }),
   ),
   payments: z.array(
-    z.object({
-      id: z.cuid2(),
-      amount: z.number(),
-      paidDate: z.iso.date(),
-      note: z.string().nullable(),
-      projectId: z.cuid2(),
-    }),
+    paymentDtoSchema,
+    // z.object({
+    //   id: z.cuid2(),
+    //   amount: z.number(),
+    //   paidDate: z.iso.date(),
+    //   note: z.string().nullable(),
+    //   projectId: z.cuid2(),
+    // }),
   ),
   createdAt: z.iso.date(),
   updatedAt: z.iso.date(),
@@ -188,5 +193,6 @@ export function transformProjectFullDataDtoToProjectDto(
     address: projectFullData.address!,
     city: projectFullData.city!,
     state: projectFullData.state!,
+    paymentMethod: projectFullData.paymentMethod!,
   };
 }

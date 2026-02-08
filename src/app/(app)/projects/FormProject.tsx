@@ -87,6 +87,7 @@ export const FormProject = ({ action, projectData }: FormProjectProps) => {
       eventTypeCode: projectData.eventTypeCode || eventTypeSelected,
       eventDate: projectData.eventDate.split("T")[0],
       localName: projectData.localName || "",
+      paymentMethod: projectData.paymentMethod || "",
       deliveryModeCode: projectData.deliveryModeCode || deliveryModeSelected,
       shippingCost: projectData.shippingCost || 0,
       address: projectData.address || "",
@@ -138,8 +139,6 @@ export const FormProject = ({ action, projectData }: FormProjectProps) => {
 
   const [isButtonDisabled, setIsButtonDisabled] = useState(isLoading);
 
-  // const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
-
   useEffect(() => {
     isReadingData && setIsReadingData(false);
   }, [isReadingData]);
@@ -152,66 +151,6 @@ export const FormProject = ({ action, projectData }: FormProjectProps) => {
     }
   }, [isValid]);
 
-  // async function deleteProject(projectId: string) {}
-
-  // const handleDeleteProject = async (
-  //   deleteConfirmation: DeleteConfirmationType,
-  // ) => {
-  //   setIsButtonDisabled(true);
-
-  //   setOpenDeleteConfirmation(true);
-
-  //   const response = await handleDialogSelection(deleteConfirmation);
-
-  //   return {
-  //     success: response.success,
-  //     message: response.message,
-  //     errors: response.errors,
-  //   };
-  // };
-
-  // const handleDialogSelection = async (
-  //   deleteConfirmation: DeleteConfirmationType,
-  // ) => {
-  //   setDeleteConfirmation(deleteConfirmation);
-
-  //   if (deleteConfirmation === "yes") {
-  //     const deleteResponse = await deleteProjectAction(projectData.id);
-  //     setDeleteConfirmation(null);
-  //     setOpenDeleteConfirmation(false);
-  //     setIsButtonDisabled(false);
-
-  //     return deleteResponse;
-  //   } else if (deleteConfirmation === "cancel") {
-  //     const cancelledProject = {
-  //       ...projectData,
-  //       statusCode: "CANCELLED",
-  //     };
-
-  //     const response = await editProjectAction(cancelledProject);
-
-  //     setDeleteConfirmation(null);
-  //     setOpenDeleteConfirmation(false);
-  //     setIsButtonDisabled(false);
-
-  //     return {
-  //       success: response.success,
-  //       message: response.message,
-  //       errors: response.errors,
-  //     };
-  //   } else {
-  //     setDeleteConfirmation(null);
-  //     setOpenDeleteConfirmation(false);
-  //     setIsButtonDisabled(false);
-
-  //     return {
-  //       success: false,
-  //       message: "Ação de exclusão cancelada.",
-  //       errors: null,
-  //     };
-  //   }
-  // };
-
   const onSubmit: SubmitHandler<ProjectDto> = async (data) => {
     setIsButtonDisabled(true);
 
@@ -219,7 +158,7 @@ export const FormProject = ({ action, projectData }: FormProjectProps) => {
       const submitResponse = await editProjectAction(data);
 
       if (submitResponse.success) {
-        const editedProject = await getProjectByIdAction(data.id);
+        const editedProject = await getProjectByIdAction(data.id!);
 
         setProjectContext(editedProject);
 
@@ -241,22 +180,6 @@ export const FormProject = ({ action, projectData }: FormProjectProps) => {
       });
     }
   };
-
-  // function handleCloseAlert(
-  //   event?: React.SyntheticEvent | Event,
-  //   reason?: SnackbarCloseReason,
-  // ) {
-  //   if (reason === "clickaway") {
-  //     return;
-  //   }
-
-  //   setOpenAlertSnackBar({
-  //     isOpen: false,
-  //     success: true,
-  //     message: "",
-  //     errorCode: null,
-  //   });
-  // }
 
   return (
     <>
@@ -497,6 +420,48 @@ export const FormProject = ({ action, projectData }: FormProjectProps) => {
 
                   <StyledFormHelperText component="p">
                     {errors.localName?.message}
+                  </StyledFormHelperText>
+                </FormControl>
+              )}
+            />
+
+            <Controller
+              name="paymentMethod"
+              control={control}
+              render={({ field }) => (
+                <FormControl
+                  fullWidth
+                  error={errors.paymentMethod ? true : false}
+                  color={errors.paymentMethod ? "error" : "secondary"}
+                >
+                  <InputLabel
+                    size="small"
+                    htmlFor="paymentMethod"
+                  >
+                    Forma de Pagamento
+                  </InputLabel>
+
+                  {action === "delete" ? (
+                    <StyledInput
+                      size="small"
+                      id="paymentMethod"
+                      {...field}
+                      value={field.value}
+                      disabled={action === "delete"}
+                    />
+                  ) : (
+                    <StyledOutlinedInput
+                      size="small"
+                      id="paymentMethod"
+                      label="Forma de Pagamento"
+                      {...field}
+                      value={field.value || ""}
+                      error={errors.paymentMethod ? true : false}
+                    />
+                  )}
+
+                  <StyledFormHelperText component="p">
+                    {errors.paymentMethod?.message}
                   </StyledFormHelperText>
                 </FormControl>
               )}
@@ -816,108 +781,6 @@ export const FormProject = ({ action, projectData }: FormProjectProps) => {
           </Stack>
         </form>
       )}
-
-      {/* <GlassDialog
-        open={openDeleteConfirmation}
-        onClose={() => setOpenDeleteConfirmation(false)}
-        // aria-modal="false"
-        maxWidth="sm"
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        PaperComponent={(props) => (
-          <GlassCardHover
-            {...props}
-            color={dialogColor}
-            sx={{ padding: 2 }}
-          />
-        )}
-        title="Confirmação de Exclusão"
-        dialogColor={dialogColor}
-      >
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            <Typography
-              variant="h6"
-              gutterBottom
-              color="textPrimary"
-            >
-              {projectData.name}
-            </Typography>
-            <Typography sx={{ mb: 2 }}>
-              Tem certeza que deseja excluir este projeto?
-            </Typography>
-
-            <Box
-              color="secondary"
-              display="flex"
-              flexDirection="column"
-            >
-              <Typography variant="caption">
-                <Typography
-                  component="span"
-                  fontWeight="bold"
-                  variant="body2"
-                >
-                  Desistir:{" "}
-                </Typography>
-                fecha esta janela sem fazer nenhuma ação
-              </Typography>
-
-              <Typography variant="caption">
-                <Typography
-                  component="span"
-                  fontWeight="bold"
-                  variant="body2"
-                >
-                  Confirmar:{" "}
-                </Typography>
-                exclui o projeto permanentemente
-              </Typography>
-
-              <Typography variant="caption">
-                <Typography
-                  component="span"
-                  fontWeight="bold"
-                  variant="body2"
-                >
-                  Cancelar:{" "}
-                </Typography>
-                muda o estado do projeto para cancelado
-              </Typography>
-            </Box>
-          </DialogContentText>
-        </DialogContent>
-
-        <Stack
-          spacing={2}
-          sx={{ marginY: 2 }}
-          direction="row"
-          justifyContent="space-around"
-        >
-          <Button
-            color={dialogColor}
-            onClick={() => handleDialogSelection("no")}
-          >
-            Desistir
-          </Button>
-
-          <Button
-            color={dialogColor}
-            onClick={() => handleDialogSelection("yes")}
-            autoFocus
-          >
-            Confirmar
-          </Button>
-
-          <Button
-            color={dialogColor}
-            onClick={() => handleDialogSelection("cancel")}
-            autoFocus
-          >
-            Cancelar
-          </Button>
-        </Stack>
-      </GlassDialog> */}
     </>
   );
 };

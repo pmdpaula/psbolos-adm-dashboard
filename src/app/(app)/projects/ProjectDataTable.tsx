@@ -131,6 +131,13 @@ export const ProjectDataTable = ({
       hideable: false,
     },
     {
+      field: "paymentMethod",
+      headerName: "Forma de Pagamento",
+      width: 130,
+      editable: false,
+      hideable: true,
+    },
+    {
       field: "deliveryModeCode",
       headerName: "Modo de Entrega",
       width: 130,
