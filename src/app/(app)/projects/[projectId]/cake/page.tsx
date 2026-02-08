@@ -69,7 +69,7 @@ const CakeInProjectPage = ({ params }: CakeInProjectPageProps) => {
       {project && (
         <>
           <ProjectHeader
-            projectId={project.id}
+            projectId={project.id!}
             name={project?.name}
             description={project?.description}
           />
@@ -89,7 +89,7 @@ const CakeInProjectPage = ({ params }: CakeInProjectPageProps) => {
               setCakeToEdit={setCakeToEdit}
             />
           ) : (
-            <FormAddCakeToProject projectId={project.id} />
+            <FormAddCakeToProject projectId={project.id!} />
           )}
 
           <Snackbar
