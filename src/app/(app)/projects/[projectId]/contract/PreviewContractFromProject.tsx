@@ -18,11 +18,11 @@ interface FieldProps extends TypographyProps {
 }
 
 type PreviewContractFromProjectProps = {
-  data: ContractData;
+  contractData: ContractData;
 };
 
 const PreviewContractFromProject = ({
-  data,
+  contractData,
 }: PreviewContractFromProjectProps) => {
   const Title = (props: TextProps) => {
     return (
@@ -84,11 +84,11 @@ const PreviewContractFromProject = ({
 
           <Field
             title="Contratante:"
-            value={data.contractorName}
+            value={contractData.contractorName}
           />
           <Field
             title="Contratada:"
-            value={data.companyData}
+            value={contractData.companyData}
           />
 
           <Typography
@@ -113,9 +113,9 @@ const PreviewContractFromProject = ({
 
           <Field
             title="Quantidade de bolos:"
-            value={String(data.cakes.length)}
+            value={String(contractData.cakes.length)}
           />
-          {data.cakes.map((cake, index) => {
+          {contractData.cakes.map((cake, index) => {
             return (
               <Box
                 key={index}
@@ -124,13 +124,20 @@ const PreviewContractFromProject = ({
               >
                 <Stack
                   direction="row"
-                  my={1}
+                  justifyContent="space-between"
+                  // my={1}
                   spacing={4}
                 >
                   <Field
                     title="Nº fatias:"
                     value={String(cake.slices || "")}
                   />
+
+                  {/* <Field
+                    title="Andares:"
+                    value={String(cake.tiers)}
+                  /> */}
+
                   <Field
                     title="Massa do bolo:"
                     value={cake.batterName}
@@ -142,21 +149,10 @@ const PreviewContractFromProject = ({
                   value={`${cake.filling1Name}, ${cake.filling2Name} e ${cake.filling3Name}`}
                 />
 
-                <Stack
-                  direction="row"
-                  my={1}
-                  spacing={4}
-                >
-                  <Field
-                    title="Andares:"
-                    value={String(cake.tiers)}
-                  />
-
-                  <Field
-                    title="Descrição:"
-                    value={cake.description}
-                  />
-                </Stack>
+                <Field
+                  title="Descrição:"
+                  value={cake.description}
+                />
               </Box>
             );
           })}
@@ -169,33 +165,32 @@ const PreviewContractFromProject = ({
           >
             <Field
               title="Valor:"
-              value={data.fullPrice.toLocaleString("pt-BR", {
+              value={contractData.fullPrice.toLocaleString("pt-BR", {
                 style: "currency",
                 currency: "BRL",
               })}
             />
             <Field
               title="Sinal:"
-              value={data.allPaymentsMade.toLocaleString("pt-BR", {
+              value={contractData.allPaymentsMade.toLocaleString("pt-BR", {
                 style: "currency",
                 currency: "BRL",
               })}
             />
-            <Field
+            {/* <Field
               title="Saldo:"
-              value={(data.fullPrice - data.allPaymentsMade).toLocaleString(
-                "pt-BR",
-                {
-                  style: "currency",
-                  currency: "BRL",
-                },
-              )}
-            />
+              value={(
+                contractData.fullPrice - contractData.allPaymentsMade
+              ).toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })}
+            /> */}
           </Stack>
 
           <Field
             title="Forma de pagamento:"
-            value={data.paymentMethod || "a definir"}
+            value={contractData.paymentMethod || "a definir"}
           />
 
           <Stack
@@ -228,11 +223,19 @@ const PreviewContractFromProject = ({
 
           <Field
             title="Local da entrega:"
-            value={data.locaName}
+            value={contractData.locaName}
           />
           <Field
             title="Data da entrega:"
-            value={data.eventDate}
+            value={new Date(contractData.eventDate).toLocaleDateString(
+              "pt-BR",
+              {
+                weekday: "long",
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              },
+            )}
           />
           {/* <Field title="Hora da entrega:" value={data.horaEntrega} /> */}
 
@@ -244,11 +247,11 @@ const PreviewContractFromProject = ({
           >
             <Field
               title="Telefone cliente:"
-              value={data.contractorContact1}
+              value={contractData.contractorContact1}
             />
             <Field
               title="Telefone adicional:"
-              value={data.contractorContact2 || ""}
+              value={contractData.contractorContact2 || ""}
             />
           </Stack>
 
@@ -260,11 +263,11 @@ const PreviewContractFromProject = ({
           >
             <Field
               title="Contato do evento:"
-              value={data.plannerName || ""}
+              value={contractData.plannerName || ""}
             />
             <Field
               title="Telefone contato do evento:"
-              value={data.plannerContact || ""}
+              value={contractData.plannerContact || ""}
             />
           </Stack>
         </Box>

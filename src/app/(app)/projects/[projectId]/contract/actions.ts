@@ -32,7 +32,7 @@ const colors = {
   vermelho: "rgb(213, 0, 0)",
 };
 
-export const generatePdfFromProject = async (data: ContractData) => {
+export const generatePdfFromProject = async (contractData: ContractData) => {
   const { jsPDF } = await import("jspdf");
 
   // Criar novo documento PDF
@@ -52,15 +52,17 @@ export const generatePdfFromProject = async (data: ContractData) => {
   doc.addFont("Roboto-Bold.ttf", "Roboto-Bold", "bold");
   doc.setFont("Roboto-Regular", "normal");
 
-  const initialYPosition = 10;
+  const initialYPosition = 4;
   let yPosition = initialYPosition;
   const margin = 10;
   const pageWidth = doc.internal.pageSize.width;
   const pageHeight = doc.internal.pageSize.height;
   const contentWidth = pageWidth - margin * 2;
+  const defaulFontSize = contractData.cakes.length > 2 ? 10 : 12;
+  const titleFontSize = 14;
 
   const addHeaderImage = () => {
-    const bannerWidth = 120;
+    const bannerWidth = 80;
     const bannerHeight = bannerWidth * 0.258;
 
     doc.addImage(
@@ -80,7 +82,7 @@ export const generatePdfFromProject = async (data: ContractData) => {
 
     // Linha separadora
     // doc.line(margin, yPosition, pageWidth - margin, yPosition, "F");
-    yPosition += 6;
+    yPosition += -2;
 
     doc.roundedRect(2, 2, pageWidth - 4, pageHeight - 4, 1, 1, "S");
   }
@@ -94,7 +96,7 @@ export const generatePdfFromProject = async (data: ContractData) => {
   const splitTextToLines = (
     text: string,
     maxWidth: number,
-    fontSize: number = 12,
+    fontSize: number = defaulFontSize,
   ) => {
     doc.setFontSize(fontSize);
     return doc.splitTextToSize(text, maxWidth);
@@ -105,7 +107,7 @@ export const generatePdfFromProject = async (data: ContractData) => {
     text,
     x,
     y,
-    fontSize = 12,
+    fontSize = defaulFontSize,
     isBold = false,
     tab = 0,
     color = "black",
@@ -132,7 +134,7 @@ export const generatePdfFromProject = async (data: ContractData) => {
     x = margin,
     multi,
   }: AddInlineTextProps) {
-    doc.setFontSize(12);
+    doc.setFontSize(defaulFontSize);
     doc.setFont("Roboto-Regular", "normal");
     doc.setTextColor("black");
     doc.text(label, x, yPosition);
@@ -149,7 +151,7 @@ export const generatePdfFromProject = async (data: ContractData) => {
     text: "1. Identificação das Partes",
     x: margin,
     y: yPosition,
-    fontSize: 14,
+    fontSize: titleFontSize,
     isBold: true,
   });
   yPosition += 1;
@@ -158,7 +160,7 @@ export const generatePdfFromProject = async (data: ContractData) => {
     label: "Contratante:",
     shift: true,
     multi: {
-      text: data.contractorName,
+      text: contractData.contractorName,
       x: margin,
       y: yPosition,
       tab: 25,
@@ -173,10 +175,10 @@ export const generatePdfFromProject = async (data: ContractData) => {
     label: "Contratada:",
     shift: true,
     multi: {
-      text: data.companyData,
+      text: contractData.companyData,
       x: margin,
       y: yPosition,
-      fontSize: 12,
+      // fontSize: defaulFontSize,
       tab: 25,
       color: colors.azulMedio,
       options: { maxWidth: contentWidth - 25 },
@@ -188,7 +190,7 @@ export const generatePdfFromProject = async (data: ContractData) => {
     text: "As partes acima têm entre si acertado o seguinte Contrato de Prestação de Serviços, que se regerá pelas seguintes clausulas e pelas condições de preço, forma e termo de pagamento descritas no presente.",
     x: margin,
     y: yPosition,
-    fontSize: 12,
+    // fontSize: defaulFontSize,
   });
   yPosition += 3;
 
@@ -197,7 +199,7 @@ export const generatePdfFromProject = async (data: ContractData) => {
     text: "2. Do Objeto do Contrato",
     x: margin,
     y: yPosition,
-    fontSize: 14,
+    fontSize: titleFontSize,
     isBold: true,
   });
   yPosition += 1;
@@ -207,49 +209,71 @@ export const generatePdfFromProject = async (data: ContractData) => {
     text: "Clausula 1ª: É objeto do presente contrato a confecção do bolo de acordo com a descrição que segue no formulário abaixo:",
     x: margin,
     y: yPosition,
-    fontSize: 12,
+    // fontSize: defaulFontSize,
   });
   yPosition += 1;
 
-  addInlineText({
-    label: "Bolos:",
-    shift: true,
-    multi: {
-      text: data.cakes.length.toString(),
-      x: margin,
-      y: yPosition,
-      fontSize: 12,
-      tab: 6,
-      color: colors.azulMedio,
-      options: { maxWidth: contentWidth - 25 },
-    },
-  });
-  yPosition += 2;
-
-  data.cakes.forEach((cake) => {
+  if (contractData.cakes.length > 1) {
     addInlineText({
-      label: "Nº de fatias:",
-      shift: false,
+      label: `Temos ${contractData.cakes.length} bolos neste contrato como segue:`,
+      shift: true,
       multi: {
-        text: String(cake.slices ?? ""),
+        text: "",
         x: margin,
         y: yPosition,
-        fontSize: 12,
-        tab: 24,
+        // fontSize: defaulFontSize,
+        tab: 6,
         color: colors.azulMedio,
+        options: { maxWidth: contentWidth - 25 },
       },
     });
+    yPosition += 1;
+  }
+
+  contractData.cakes.forEach((cake) => {
+    doc.setFillColor(243, 244, 246);
+    doc.roundedRect(margin, yPosition - 5, contentWidth, 30, 2, 2, "F");
+
+    if (cake.slices) {
+      addInlineText({
+        label: "Nº de fatias:",
+        shift: false,
+        x: margin + 2,
+        multi: {
+          text: String(cake.slices ?? ""),
+          x: margin,
+          y: yPosition,
+          // fontSize: defaulFontSize,
+          tab: 28,
+          color: colors.azulMedio,
+        },
+      });
+    }
+
+    // addInlineText({
+    //   label: "Andares:",
+    //   shift: false,
+    //   x: 60,
+    //   multi: {
+    //     text: String(cake.tiers),
+    //     x: 54,
+    //     y: yPosition,
+    //     fontSize: defaulFontSize,
+    //     tab: 24,
+    //     color: colors.azulMedio,
+    //   },
+    // });
 
     addInlineText({
       label: "Massa:",
       shift: true,
-      x: 80,
+      x: 60,
       multi: {
         text: cake.batterName,
-        x: margin + 80,
+        x: 60,
         y: yPosition,
-        fontSize: 12,
-        tab: 6,
+        // fontSize: defaulFontSize,
+        tab: 20,
         color: colors.azulMedio,
       },
     });
@@ -263,31 +287,33 @@ export const generatePdfFromProject = async (data: ContractData) => {
     addInlineText({
       label: "Recheios:",
       shift: true,
+      x: margin + 2,
       multi: {
         text: fillingText,
         x: margin,
         y: yPosition,
-        fontSize: 12,
-        tab: 20,
+        // fontSize: defaulFontSize,
+        tab: 22,
         color: colors.azulMedio,
       },
     });
-    yPosition += 1;
+    yPosition += 0.5;
 
     addInlineText({
       label: "Descrição:",
       shift: true,
+      x: margin + 2,
       multi: {
         text: cake.description,
-        x: margin,
+        x: margin + 2,
         y: yPosition,
-        fontSize: 12,
-        tab: 28,
+        fontSize: cake.description.length > 96 ? 10 : defaulFontSize,
+        tab: 22,
         color: colors.azulMedio,
         options: { maxWidth: contentWidth - 28 },
       },
     });
-    yPosition += 1;
+    // yPosition += 1;
 
     // addInlineText({
     //   label: "Modelo:",
@@ -296,22 +322,22 @@ export const generatePdfFromProject = async (data: ContractData) => {
     //     text: data.modeloBolo,
     //     x: margin,
     //     y: yPosition,
-    //     fontSize: 12,
+    //     fontSize: defaulFontSize,
     //     tab: 20,
     //     color: colors.azulMedio,
     //   },
     // });
-    // yPosition += 1;
+    yPosition += cake.description.length < 96 ? 3 : 1;
   });
 
   addInlineText({
     label: "Valor:",
     shift: false,
     multi: {
-      text: `R$ ${data.fullPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 }) || "0,00"}`,
+      text: `R$ ${contractData.fullPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 }) || "0,00"}`,
       x: margin,
       y: yPosition,
-      fontSize: 12,
+      // fontSize: defaulFontSize,
       tab: 15,
       color: colors.azulMedio,
     },
@@ -319,41 +345,41 @@ export const generatePdfFromProject = async (data: ContractData) => {
 
   addInlineText({
     label: "Sinal:",
-    shift: false,
-    x: 60,
+    shift: true,
+    x: 70,
     multi: {
-      text: `R$ ${data.allPaymentsMade.toLocaleString("pt-BR", { minimumFractionDigits: 2 }) || "0,00"}`,
-      x: margin + 60,
+      text: `R$ ${contractData.allPaymentsMade.toLocaleString("pt-BR", { minimumFractionDigits: 2 }) || "0,00"}`,
+      x: margin + 70,
       y: yPosition,
-      fontSize: 12,
+      // fontSize: defaulFontSize,
       tab: 6,
       color: colors.azulMedio,
     },
   });
 
-  addInlineText({
-    label: "Saldo:",
-    shift: true,
-    x: 120,
-    multi: {
-      text: `R$ ${(Number(data.fullPrice) - Number(data.allPaymentsMade)).toLocaleString("pt-BR", { minimumFractionDigits: 2 }) || "0,00"}`,
-      x: margin + 120,
-      y: yPosition,
-      fontSize: 12,
-      tab: 6,
-      color: colors.azulMedio,
-    },
-  });
+  // addInlineText({
+  //   label: "Saldo:",
+  //   shift: true,
+  //   x: 140,
+  //   multi: {
+  //     text: `R$ ${(Number(data.fullPrice) - Number(data.allPaymentsMade)).toLocaleString("pt-BR", { minimumFractionDigits: 2 }) || "0,00"}`,
+  //     x: margin + 140,
+  //     y: yPosition,
+  //     fontSize: 12,
+  //     tab: 6,
+  //     color: colors.azulMedio,
+  //   },
+  // });
   yPosition += 1;
 
   addInlineText({
     label: "Forma de pagamento:",
     shift: true,
     multi: {
-      text: data.paymentMethod || "A definir",
-      x: margin,
+      text: contractData.paymentMethod || "A definir",
+      x: margin + 2,
       y: yPosition,
-      fontSize: 12,
+      // fontSize: defaulFontSize,
       tab: 42,
       color: colors.azulMedio,
     },
@@ -367,11 +393,12 @@ export const generatePdfFromProject = async (data: ContractData) => {
       text: `${companyData.bankData.bankName} (${companyData.bankData.bankNumber}), ag. ${companyData.bankData.agency}, cc. ${companyData.bankData.account}`,
       x: margin,
       y: yPosition,
-      fontSize: 12,
+      // fontSize: defaulFontSize,
       tab: 36,
       color: colors.azulMedio,
     },
   });
+
   addInlineText({
     label: "PIX:",
     shift: true,
@@ -380,7 +407,7 @@ export const generatePdfFromProject = async (data: ContractData) => {
       text: `${companyData.bankData.pixType} - ${companyData.bankData.pix}`,
       x: margin + 130,
       y: yPosition,
-      fontSize: 12,
+      // fontSize: defaulFontSize,
       tab: 6,
       color: colors.azulMedio,
     },
@@ -393,7 +420,7 @@ export const generatePdfFromProject = async (data: ContractData) => {
     text: "3. Obrigações da Contratante",
     x: margin,
     y: yPosition,
-    fontSize: 14,
+    fontSize: titleFontSize,
     isBold: true,
   });
   yPosition += 1;
@@ -403,7 +430,7 @@ export const generatePdfFromProject = async (data: ContractData) => {
     text: "Clausula 2ª: A CONTRATANTE deverá fornecer a CONTRATADA as informações do formulário seguinte a fim de que a entrega seja feita sem contratempos para ambas as partes.",
     x: margin,
     y: yPosition,
-    fontSize: 12,
+    // fontSize: defaulFontSize,
     isBold: false,
   });
   yPosition += 1;
@@ -412,10 +439,10 @@ export const generatePdfFromProject = async (data: ContractData) => {
     label: "Local de entrega:",
     shift: true,
     multi: {
-      text: data.locaName,
+      text: contractData.locaName,
       x: margin,
       y: yPosition,
-      fontSize: 12,
+      // fontSize: defaulFontSize,
       tab: 36,
       color: colors.azulMedio,
     },
@@ -426,10 +453,16 @@ export const generatePdfFromProject = async (data: ContractData) => {
     label: "Data da entrega:",
     shift: true,
     multi: {
-      text: data.eventDate || "A definir",
+      text:
+        new Date(contractData.eventDate).toLocaleDateString("pt-BR", {
+          weekday: "long",
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        }) || "A definir",
       x: margin,
       y: yPosition,
-      fontSize: 12,
+      // fontSize: defaulFontSize,
       tab: 36,
       color: colors.azulMedio,
     },
@@ -441,10 +474,10 @@ export const generatePdfFromProject = async (data: ContractData) => {
     label: "Telefone cliente:",
     shift: false,
     multi: {
-      text: data.contractorContact1,
+      text: contractData.contractorContact1 || "Não informado",
       x: margin,
       y: yPosition,
-      fontSize: 12,
+      // fontSize: defaulFontSize,
       tab: 36,
       color: colors.azulMedio,
     },
@@ -455,10 +488,10 @@ export const generatePdfFromProject = async (data: ContractData) => {
     shift: true,
     x: 100,
     multi: {
-      text: data.contractorContact2 || "Não informado",
-      x: margin + 100,
+      text: contractData.contractorContact2 || "Não informado",
+      x: margin + 94,
       y: yPosition,
-      fontSize: 12,
+      // fontSize: defaulFontSize,
       tab: 42,
       color: colors.azulMedio,
     },
@@ -469,10 +502,10 @@ export const generatePdfFromProject = async (data: ContractData) => {
     label: "Contato do evento:",
     shift: false,
     multi: {
-      text: data.plannerName || "Mesmo do cliente",
-      x: margin,
+      text: contractData.plannerName || "Mesmo do cliente",
+      x: margin + 2,
       y: yPosition,
-      fontSize: 12,
+      // fontSize: defaulFontSize,
       tab: 36,
       color: colors.azulMedio,
     },
@@ -483,10 +516,10 @@ export const generatePdfFromProject = async (data: ContractData) => {
     shift: true,
     x: 100,
     multi: {
-      text: data.plannerContact || "Mesmo do cliente",
-      x: margin + 100,
+      text: contractData.plannerContact || "Mesmo do cliente",
+      x: margin + 102,
       y: yPosition,
-      fontSize: 12,
+      // fontSize: defaulFontSize,
       tab: 43,
       color: colors.azulMedio,
     },
@@ -504,7 +537,7 @@ export const generatePdfFromProject = async (data: ContractData) => {
     text: "4. Políticas de Cancelamento ou Adiamento",
     x: margin,
     y: yPosition,
-    fontSize: 14,
+    fontSize: titleFontSize,
     isBold: true,
   });
   yPosition += 1;
@@ -513,7 +546,7 @@ export const generatePdfFromProject = async (data: ContractData) => {
     text: "Clausula 3ª: Casos de desistência por parte do contratante:",
     x: margin,
     y: yPosition,
-    fontSize: 12,
+    // fontSize: defaulFontSize,
     isBold: false,
   });
   yPosition += 2;
@@ -541,7 +574,7 @@ export const generatePdfFromProject = async (data: ContractData) => {
     text: "Clausula 4ª: Para adiamento de data, o valor do produto poderá sofrer reajuste da seguinte forma:",
     x: margin,
     y: yPosition,
-    fontSize: 12,
+    // fontSize: defaulFontSize,
     isBold: false,
   });
 
@@ -566,7 +599,7 @@ export const generatePdfFromProject = async (data: ContractData) => {
     text: "5. Da Validação do Contrato",
     x: margin,
     y: yPosition,
-    fontSize: 14,
+    fontSize: titleFontSize,
     isBold: true,
   });
   yPosition += 1;
@@ -576,7 +609,7 @@ export const generatePdfFromProject = async (data: ContractData) => {
     text: "Clausula 5ª: A data somente será reservada mediante pagamento de sinal.",
     x: margin,
     y: yPosition,
-    fontSize: 12,
+    // fontSize: defaulFontSize,
     isBold: false,
   });
   yPosition += 1;
@@ -586,7 +619,7 @@ export const generatePdfFromProject = async (data: ContractData) => {
     text: "Clausula 6ª: O valor total deverá estar quitado até 7 dias antes da data do evento sob pena de perder a reserva da data.",
     x: margin,
     y: yPosition,
-    fontSize: 12,
+    // fontSize: defaulFontSize,
     isBold: false,
   });
   yPosition += 1;
@@ -596,7 +629,7 @@ export const generatePdfFromProject = async (data: ContractData) => {
     text: "Clausula final: Se por efeito de força maior, o bolo não puder ser feito pela Patricia Siqueira, será feito a devolução total do valor.",
     x: margin,
     y: yPosition,
-    fontSize: 12,
+    // fontSize: defaulFontSize,
     isBold: false,
   });
   yPosition += 10;
@@ -616,7 +649,7 @@ export const generatePdfFromProject = async (data: ContractData) => {
   yPosition += 4;
   addMultilineText({
     text: "Assinatura da(o) Contratante",
-    x: margin,
+    x: margin + 10,
     y: yPosition,
     fontSize: 10,
   });
@@ -625,7 +658,7 @@ export const generatePdfFromProject = async (data: ContractData) => {
   // doc.line(pageWidth - margin - 70, yPosition - 10, pageWidth - margin, yPosition - 10);
   addMultilineText({
     text: "Assinatura da Contratada",
-    x: pageWidth - margin - 60,
+    x: pageWidth - margin - 58,
     y: yPosition,
     fontSize: 10,
   });
@@ -639,8 +672,8 @@ export const generatePdfFromProject = async (data: ContractData) => {
       text: currentDate,
       x: margin + 12,
       y: yPosition,
-      fontSize: 12,
-      tab: 8,
+      // fontSize: defaulFontSize,
+      tab: 2,
       color: colors.azulMedio,
     },
   });

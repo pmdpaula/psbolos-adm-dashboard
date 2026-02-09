@@ -2,16 +2,19 @@
 
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import {
-  Alert,
   Box,
   Button,
   CircularProgress,
   Stack,
+  Typography,
   useMediaQuery,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 
+import GlassButton from "@/components/glass/GlassButton";
+import GlassCard from "@/components/glass/GlassCard";
 import { companyData } from "@/data/companyData";
 import type { ProjectFullDataDto } from "@/data/dto/project-dto";
 import { getCakeBatters } from "@/http/data-types/get-cake-batters";
@@ -28,6 +31,8 @@ import PreviewContractFromProject from "./PreviewContractFromProject";
 //   const data: ProjectFullDataDto = projectFullDataInDb;
 //   return data;
 // };
+
+// TODO: Alterar o alerta para o componente GlassPaper em amarelo.
 
 interface ProjectContractPageProps {
   params: Promise<{ projectId: string }>;
@@ -73,13 +78,11 @@ export type ContractData = {
 
 const ProjectContractPage = ({ params }: ProjectContractPageProps) => {
   const { projectId } = use(params);
+  const router = useRouter();
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 
   const [contractData, setContractData] = useState<ContractData | null>(null);
   const [contractorData, setContractorData] = useState<
-    ProjectFullDataDto["collaboratorsInProject"][0] | null
-  >(null);
-  const [plannerData, setPlannerData] = useState<
     ProjectFullDataDto["collaboratorsInProject"][0] | null
   >(null);
   const [isReadingData, setIsReadingData] = useState(true);
@@ -112,7 +115,7 @@ const ProjectContractPage = ({ params }: ProjectContractPageProps) => {
   function getPlannerData(projectData: ProjectFullDataDto) {
     return (
       projectData.collaboratorsInProject.find(
-        (collab) => collab.role === "PLANNER",
+        (collab) => collab.collaboratorType.code === "PLANNER",
       ) || null
     );
   }
@@ -140,7 +143,7 @@ const ProjectContractPage = ({ params }: ProjectContractPageProps) => {
 
       return {
         description: cake.description,
-        slices: cake.slices,
+        slices: cake.slices || 0,
         tiers: cake.tiers,
         price: cake.price,
         batterName,
@@ -154,30 +157,14 @@ const ProjectContractPage = ({ params }: ProjectContractPageProps) => {
       contractorName: contractor.collaborator.name,
       companyData: `${companyData.representativeName}, ${companyData.representativeRole}, representante da ${companyData.name}, localizada na ${companyData.address} , inscrita no ${companyData.companyIdType}: ${companyData.companyIdNumber}`,
       cakes: transformedCakes,
-      // qtdFatias: projectData.cake.slices.toString(),
-      // massaBolo: projectData.cake.batter,
-      // recheio1: projectData.cake.filling1,
-      // recheio2: projectData.cake.filling2 || "",
-      // recheio3: projectData.cake.filling3 || "",
-      // observacoesBolo: projectData.cake.notes || "",
-      // modeloBolo: projectData.cake.model,
-      // valorBolo: projectData.payment.totalValue.toString(),
-      // sinalBolo: projectData.payment.downPayment.toString(),
-      // saldoBolo: (
-      //   projectData.payment.totalValue - projectData.payment.downPayment
-      // ).toString(),
-      // formaPagamentoBolo: projectData.payment.paymentMethod,
       locaName: projectData.localName || "",
       eventDate: projectData.eventDate,
       eventHour: "a definir",
       contractorContact1: contractor.collaborator.contact1 || "",
       contractorContact2: contractor.collaborator.contact2 || "",
-      plannerName: plannerData?.collaborator.name || "",
+      plannerName: planner?.collaborator.name || "",
       plannerContact:
-        planner?.collaborator.contact1 ||
-        planner?.collaborator.contact2 ||
-        planner?.collaborator.contact2 ||
-        "",
+        planner?.collaborator.contact1 || planner?.collaborator.contact2 || "",
       fullPrice: projectData.cakes.reduce((total, price) => {
         return total + price.price;
       }, projectData.shippingCost),
@@ -192,13 +179,15 @@ const ProjectContractPage = ({ params }: ProjectContractPageProps) => {
     generatePdfFromProject(contractData!);
   }
 
+  const isContractReadyToBeGenerated =
+    contractData !== null && projectFull!.cakes.length > 0;
+
   useEffect(() => {
     if (projectFull && !isLoadingCakeBatters && !isLoadingCakeFillings) {
       const contractor = getContractorData(projectFull);
       const planner = getPlannerData(projectFull);
 
       setContractorData(contractor);
-      setPlannerData(planner);
 
       if (contractor) {
         const transformedData = transformProjectDataToContractData(
@@ -232,42 +221,105 @@ const ProjectContractPage = ({ params }: ProjectContractPageProps) => {
                 description={projectFull.description || ""}
               />
 
-              <Stack spacing={2}>
+              <Stack spacing={3}>
                 <Button
+                  color="success"
                   variant="contained"
                   startIcon={<PictureAsPdfIcon />}
-                  fullWidth
                   disabled={!contractData}
                   onClick={handleGeneratePdf}
+                  sx={{
+                    height: 50,
+                    width: isMobile ? "90%" : "50%",
+                    alignSelf: "center",
+                  }}
                 >
                   Gerar PDF
                 </Button>
 
-                {contractorData && contractData ? (
-                  <PreviewContractFromProject data={contractData!} />
+                {contractorData &&
+                contractData &&
+                isContractReadyToBeGenerated ? (
+                  <PreviewContractFromProject contractData={contractData!} />
                 ) : (
-                  <Stack
-                    direction="row"
-                    justifyContent="center"
-                    alignItems="center"
-                    sx={{ mt: 4 }}
+                  <GlassCard
+                    color="warning"
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      p: 3,
+                      textAlign: "center",
+                    }}
                   >
-                    <Alert
-                      severity="warning"
-                      sx={{ width: "90%" }}
+                    <Typography
+                      variant="h5"
+                      fontWeight={600}
+                      color="warning"
                     >
-                      O projeto não possui um contratante definido. Não é
-                      possível gerar um contrato.
-                    </Alert>
-                  </Stack>
+                      Contrato não pode ser gerado
+                    </Typography>
+
+                    {!contractorData && (
+                      <>
+                        <Typography
+                          color="warning"
+                          mt={1}
+                        >
+                          O projeto não possui um contratante definido.
+                        </Typography>
+
+                        <GlassButton
+                          color="info"
+                          onClick={() =>
+                            router.push(`/projects/${projectId}/connect`)
+                          }
+                          sx={{
+                            mt: 2,
+                            p: 2,
+                            color: "inherit",
+                            alignSelf: "center",
+                            minWidth: "260px",
+                          }}
+                        >
+                          Adicionar colaborador
+                        </GlassButton>
+                      </>
+                    )}
+
+                    {projectFull.cakes.length === 0 && (
+                      <>
+                        <Typography
+                          color="warning"
+                          mt={!contractorData ? 5 : 1}
+                        >
+                          O projeto não possui bolos definidos.
+                        </Typography>
+
+                        <GlassButton
+                          color="info"
+                          onClick={() =>
+                            router.push(`/projects/${projectId}/cake`)
+                          }
+                          sx={{
+                            mt: 2,
+                            p: 2,
+                            color: "inherit",
+                            alignSelf: "center",
+                            minWidth: "260px",
+                          }}
+                        >
+                          Adicionar bolo
+                        </GlassButton>
+                      </>
+                    )}
+                  </GlassCard>
                 )}
               </Stack>
             </>
           )}
         </>
       )}
-
-      {/* {projectFull && <pre>{JSON.stringify(projectFull, null, 2)}</pre>} */}
     </>
   );
 };
