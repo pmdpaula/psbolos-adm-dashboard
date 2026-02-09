@@ -91,7 +91,7 @@ const ConnectCollaboratorsPage = ({
       ) : (
         <>
           <ProjectHeader
-            projectId={project.id}
+            projectId={project.id!}
             name={project?.name}
             description={project?.description}
           />
