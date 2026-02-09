@@ -3,6 +3,8 @@ import Link from "next/link";
 
 import { NeonText } from "@/components/NeonText";
 
+// TODO: Diminuir o  tamanho do header em mobile.
+
 interface ProjectHeaderProps {
   projectId: string;
   name: string;

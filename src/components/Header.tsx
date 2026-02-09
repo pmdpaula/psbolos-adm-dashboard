@@ -1,11 +1,9 @@
 "use client";
 
-import { Typography } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
-import { useTheme } from "@mui/material/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
+import { alpha } from "@mui/material/styles";
 import { z } from "zod";
 
 import { OptionsMenu } from "@/components/OptionsMenu";
@@ -15,36 +13,38 @@ import { MainLogo } from "./MainLogo";
 
 export const headerSchema = z.object({
   variant: z.enum(["common", "contract"]).nullable().optional(),
-  title: z.string().min(1).max(20).nullable().optional(),
 });
-
-// TODO: Ajustar altura para que não haja diferença entre antes e depois de ler os dados
 
 type HeaderProps = z.infer<typeof headerSchema>;
 
-// interface HeaderProps {
-//   variant?: "common" | "contract";
-//   title: string;
-// }
-
-export const Header = ({ variant = "common", title = "" }: HeaderProps) => {
-  const theme = useTheme();
-  const isBreakpointSm = useMediaQuery(theme.breakpoints.up("sm"));
-  const isBreakpointMd = useMediaQuery(theme.breakpoints.up("md"));
-  const isBreakpointLg = useMediaQuery(theme.breakpoints.up("lg"));
-
+export const Header = ({ variant = "common" }: HeaderProps) => {
   return (
     <header>
       <Box
-        width="100%"
-        mb={isBreakpointLg ? 13 : isBreakpointMd ? 12 : isBreakpointSm ? 10 : 8}
+        sx={{
+          position: "fixed",
+          width: "100%",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: (theme) => theme.zIndex.appBar,
+          // height: 40,
+          // height: isMobile ? 42 : 68,
+          backgroundColor: "transparent",
+          // marginBottom: 10,
+        }}
       >
         <AppBar
           position="fixed"
           sx={{
-            padding: isBreakpointSm ? 2 : 1,
-            backdropFilter: "blur(10px)",
-            backgroundColor: theme.palette.background.paper,
+            paddingX: 2,
+            height: 64,
+            // backgroundColor: "transparent",
+            backdropFilter: "blur(6px)",
+            backgroundColor: (theme) =>
+              alpha(theme.palette.background.paper, 0.7),
+            display: "flex",
+            justifyContent: "center",
           }}
         >
           <Stack
@@ -53,13 +53,6 @@ export const Header = ({ variant = "common", title = "" }: HeaderProps) => {
             justifyContent="space-between"
           >
             <MainLogo title="Patricia Siqueira" />
-
-            <Typography
-              variant={isBreakpointLg ? "h3" : "h5"}
-              color="pink"
-            >
-              {title}
-            </Typography>
 
             {variant === "contract" && <OptionsMenu />}
 

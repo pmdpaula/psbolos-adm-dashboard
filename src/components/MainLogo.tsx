@@ -27,7 +27,7 @@ export const MainLogo = ({ title, size }: MainLogoProps) => {
     >
       <Link href="/">
         <NeonCircle
-          diameter={size || (isBreakpointLg ? 60 : isBreakpointMd ? 40 : 30)}
+          diameter={size || (isBreakpointLg ? 60 : isBreakpointMd ? 40 : 36)}
         >
           <PSBIconLight amplitude={100} />
         </NeonCircle>
@@ -38,6 +38,7 @@ export const MainLogo = ({ title, size }: MainLogoProps) => {
           variant={isBreakpointLg ? "h3" : "h5"}
           fontFamily="Ephesis"
           color="pink"
+          fontWeight={500}
         >
           {title}
         </NeonText>
