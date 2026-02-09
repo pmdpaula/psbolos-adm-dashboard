@@ -4,12 +4,15 @@ import { Alert, Box, Snackbar, type SnackbarCloseReason } from "@mui/material";
 import { use, useEffect, useState } from "react";
 
 import { useMainContext } from "@/app/MainContext";
+import { BackdropLoading } from "@/components/BackdropLoading";
+import type { PaymentDto } from "@/data/dto/payment-dto";
 import type { ProjectDto } from "@/data/dto/project-dto";
 import { getProjectById } from "@/http/project/get-project-by-id";
 
 import { ProjectHeader } from "../../components/ProjectHeader";
 import { useProjectContext } from "../../ProjectContext";
 import { FormAddPaymentToProject } from "./FormAddPaymentToProject";
+import { FormEditPaymentToProject } from "./FormEditPaymentToProject";
 import { PaymentsInProjectList } from "./PaymentsInProjectList";
 
 interface PaymentInProjectPageProps {
@@ -20,6 +23,8 @@ const PaymentInProjectPage = ({ params }: PaymentInProjectPageProps) => {
   const { projectId } = use(params);
   const [isReadingData, setIsReadingData] = useState(true);
   const [project, setProject] = useState<ProjectDto | null>(null);
+  const [paymentToEdit, setPaymentToEdit] = useState<PaymentDto | null>(null);
+  const [formMode, setFormMode] = useState<"add" | "edit">("add");
 
   const { openAlertSnackBar, setOpenAlertSnackBar } = useMainContext();
   const { refreshKey } = useProjectContext();
@@ -57,13 +62,13 @@ const PaymentInProjectPage = ({ params }: PaymentInProjectPageProps) => {
   }
 
   return isReadingData ? (
-    <div>Loading...</div>
+    <BackdropLoading isLoading={isReadingData} />
   ) : (
     <>
       {project && (
         <>
           <ProjectHeader
-            projectId={project.id}
+            projectId={project.id!}
             name={project?.name}
             description={project?.description}
           />
@@ -71,9 +76,20 @@ const PaymentInProjectPage = ({ params }: PaymentInProjectPageProps) => {
           <PaymentsInProjectList
             projectId={projectId}
             key={refreshKey}
+            formMode={formMode}
+            setPaymentToEdit={setPaymentToEdit}
+            setFormMode={setFormMode}
           />
 
-          <FormAddPaymentToProject projectId={project.id} />
+          {formMode === "edit" && paymentToEdit ? (
+            <FormEditPaymentToProject
+              payment={paymentToEdit}
+              setFormMode={setFormMode}
+              setPaymentToEdit={setPaymentToEdit}
+            />
+          ) : (
+            <FormAddPaymentToProject projectId={project.id!} />
+          )}
 
           <Snackbar
             open={openAlertSnackBar.isOpen}

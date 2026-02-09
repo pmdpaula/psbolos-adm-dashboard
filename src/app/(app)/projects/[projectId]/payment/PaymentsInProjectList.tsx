@@ -7,8 +7,10 @@ import {
   Box,
   Button,
   Chip,
+  darken,
   Divider,
   FormControl,
+  Icon,
   IconButton,
   List,
   ListItem,
@@ -27,15 +29,21 @@ import { StyledSwitch } from "@/components/StyledSwitch";
 import type { PaymentDto } from "@/data/dto/payment-dto";
 import theme from "@/theme/theme";
 
+import { getProjectFullDataByIdAction } from "../../action";
 import { useProjectContext } from "../../ProjectContext";
 import { fetchPaymentsByProjectIdAction, removePaymentAction } from "./actions";
 
 interface PaymentsInProjectListProps {
   projectId: string;
+  formMode: "add" | "edit";
+  setFormMode: React.Dispatch<React.SetStateAction<"add" | "edit">>;
+  setPaymentToEdit: React.Dispatch<React.SetStateAction<PaymentDto | null>>;
 }
 
 export const PaymentsInProjectList = ({
   projectId,
+  setFormMode,
+  setPaymentToEdit,
 }: PaymentsInProjectListProps) => {
   const isBreakpointMinusMd = useMediaQuery(theme.breakpoints.down("sm"));
   const { setOpenAlertSnackBar } = useMainContext();
@@ -48,6 +56,11 @@ export const PaymentsInProjectList = ({
   );
 
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const [projectBudget, setProjectBudget] = useState(0);
+
+  useEffect(() => {
+    setIsButtonDisabled(paymentsToDisconnect.length === 0);
+  }, [paymentsToDisconnect]);
 
   async function handleSubmitRemove(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -91,21 +104,24 @@ export const PaymentsInProjectList = ({
     setRefreshKey((prevKey) => prevKey + 1);
   }
 
-  // function handleCloseAlert(
-  //   event?: React.SyntheticEvent | Event,
-  //   reason?: SnackbarCloseReason,
-  // ) {
-  //   if (reason === "clickaway") {
-  //     return;
-  //   }
+  const handleEditPayment = (payment: PaymentDto) => {
+    setPaymentToEdit(payment);
+    setFormMode("edit");
+  };
 
-  //   setOpenAlertSnackBar({
-  //     isOpen: false,
-  //     success: true,
-  //     message: "",
-  //     errorCode: null,
-  //   });
-  // }
+  async function getProjectBudget(projectId: string): Promise<void> {
+    try {
+      const projectFullData = await getProjectFullDataByIdAction(projectId);
+      const projectBudget = projectFullData.cakes.reduce(
+        (total, cake) => total + cake.price,
+        0,
+      );
+      console.log("🚀 ~ getProjectBudget ~ projectBudget:", projectBudget);
+      setProjectBudget(projectBudget);
+    } catch (error) {
+      console.error("Houve erro ao obter o orçamento do projeto:", error);
+    }
+  }
 
   async function fetchPaymentsInProject(
     projectId: string,
@@ -127,6 +143,12 @@ export const PaymentsInProjectList = ({
     fetchPaymentsInProject(projectId).then((data) => {
       setPayments(data);
     });
+
+    const fetchProjectBudget = async () => {
+      await getProjectBudget(projectId);
+    };
+
+    fetchProjectBudget();
   }, [projectId]);
 
   useEffect(() => {
@@ -193,6 +215,17 @@ export const PaymentsInProjectList = ({
                         gap: 2,
                       }}
                     >
+                      <Tooltip title="Clique para editar o pagamento">
+                        <Icon
+                          color="warning"
+                          fontSize="large"
+                          sx={{ marginRight: 1.5, cursor: "pointer" }}
+                          onClick={() => handleEditPayment(payment)}
+                        >
+                          edit_note
+                        </Icon>
+                      </Tooltip>
+
                       <Typography
                         variant="body1"
                         sx={{ fontWeight: "bold" }}
@@ -236,7 +269,7 @@ export const PaymentsInProjectList = ({
                           } else {
                             setPaymentsToDisconnect([
                               ...paymentsToDisconnect,
-                              payment.id,
+                              payment.id!,
                             ]);
                           }
                         }}
@@ -262,31 +295,75 @@ export const PaymentsInProjectList = ({
           </form>
         </List>
 
-        {payments.length > 0 && (
-          <Box
+        <Box
+          sx={{
+            mt: 2,
+            p: 2,
+          }}
+        >
+          <Stack
+            id="budget"
+            direction="row"
+            spacing={0}
+            justifyContent="flex-start"
             sx={{
-              mt: 2,
-              p: 2,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+              color: "text.secondary",
+              width: "100%",
+              height: "45px",
+              padding: 0,
+              borderRadius: 8,
+              overflow: "hidden",
+              boxShadow: 5,
             }}
           >
-            <Typography
-              variant="h6"
-              color="primary"
+            <Box
+              id="payments"
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                background: (theme) =>
+                  `linear-gradient(to right, ${theme.palette.success[theme.palette.mode]}, ${darken(theme.palette.success[theme.palette.mode], 0.2)} 70%, ${darken(theme.palette.success[theme.palette.mode], 1)} 100%)`,
+                width:
+                  getTotalPaymentsAmount() > projectBudget
+                    ? "100%"
+                    : `${(getTotalPaymentsAmount() / projectBudget) * 100}%`,
+              }}
             >
-              Total:
-            </Typography>
+              {projectBudget - getTotalPaymentsAmount() > 0
+                ? getTotalPaymentsAmount().toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  })
+                : "Quitado"}
+            </Box>
 
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: "bold" }}
-            >
-              R$ {getTotalPaymentsAmount().toFixed(2)}
-            </Typography>
-          </Box>
-        )}
+            {projectBudget - getTotalPaymentsAmount() > 0 && (
+              <Box
+                id="budget"
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  background: (theme) =>
+                    `linear-gradient(to right, ${darken(theme.palette.error[theme.palette.mode], 1)}, ${darken(theme.palette.error[theme.palette.mode], 0.2)} 30%, ${theme.palette.error[theme.palette.mode]} 100%)`,
+                  width:
+                    getTotalPaymentsAmount() > projectBudget
+                      ? "100%"
+                      : `${((projectBudget - getTotalPaymentsAmount()) / projectBudget) * 100}%`,
+                }}
+              >
+                {(projectBudget - getTotalPaymentsAmount()).toLocaleString(
+                  "pt-BR",
+                  {
+                    style: "currency",
+                    currency: "BRL",
+                  },
+                )}
+              </Box>
+            )}
+          </Stack>
+        </Box>
       </GradientPaper>
 
       {/* <Snackbar

@@ -23,7 +23,7 @@ export const createPaymentDtoSchema = z.object({
 export type CreatePaymentDto = z.infer<typeof createPaymentDtoSchema>;
 
 export const paymentDtoSchema = z.object({
-  id: z.cuid2(),
+  id: z.cuid2().optional(),
   ...createPaymentDtoSchema.shape,
 });
 
