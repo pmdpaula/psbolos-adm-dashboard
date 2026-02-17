@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState } from "react";
 
+import { MainContextSnackbar } from "@/components/MainContextSnackbar";
 import type { AlertType } from "@/lib/alert";
 
 export type MainContextType = {
@@ -44,6 +45,7 @@ export const MainProvider = ({ children }: MainProviderProps) => {
   return (
     <MainContext.Provider value={contextDefinitions}>
       {children}
+      <MainContextSnackbar />
     </MainContext.Provider>
   );
 };
