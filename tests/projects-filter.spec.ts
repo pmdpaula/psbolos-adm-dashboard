@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { getDateOnly } from "@/lib/data-utils";
+
 // Funções de filtro (copiadas do componente)
 const getNextSunday = (dateString: string) => {
   const [year, month, day] = dateString.split("T")[0].split("-").map(Number);
@@ -8,12 +10,6 @@ const getNextSunday = (dateString: string) => {
   const daysUntilSunday = dayOfWeek === 0 ? 7 : 7 - dayOfWeek;
   date.setDate(date.getDate() + daysUntilSunday);
   return date;
-};
-
-const getDateOnly = (dateString: string) => {
-  // Extrai apenas a data (YYYY-MM-DD) sem interpretar como UTC
-  const [year, month, day] = dateString.split("T")[0].split("-").map(Number);
-  return new Date(year, month - 1, day);
 };
 
 // Mock de ProjectDto

@@ -10,6 +10,7 @@ import { getDeliveryModes } from "@/http/data-types/get-delivery-modes";
 import { getEventTypes } from "@/http/data-types/get-event-types";
 import { getProjectStatuses } from "@/http/data-types/get-project-statuses";
 import { getProjects } from "@/http/project/get-projects";
+import { getDateOnly } from "@/lib/data-utils";
 
 import { NearestProjects } from "./NearestProjects";
 import { ProjectsList } from "./ProjectsList";
@@ -73,15 +74,6 @@ const ProjectPage = () => {
       const daysUntilSunday = dayOfWeek === 0 ? 7 : 7 - dayOfWeek;
       date.setDate(date.getDate() + daysUntilSunday);
       return date;
-    };
-
-    const getDateOnly = (dateString: string) => {
-      // Extrai apenas a data (YYYY-MM-DD) sem interpretar como UTC
-      const [year, month, day] = dateString
-        .split("T")[0]
-        .split("-")
-        .map(Number);
-      return new Date(year, month - 1, day);
     };
 
     const now = new Date();

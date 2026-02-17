@@ -2,6 +2,7 @@ import type { TextOptionsLight } from "jspdf";
 
 import bannerPSB from "@/assets/psb-banner.png";
 import { companyData } from "@/data/companyData";
+import { getDateOnly } from "@/lib/data-utils";
 
 import type { ContractData } from "./page";
 
@@ -454,12 +455,15 @@ export const generatePdfFromProject = async (contractData: ContractData) => {
     shift: true,
     multi: {
       text:
-        new Date(contractData.eventDate).toLocaleDateString("pt-BR", {
-          weekday: "long",
-          day: "2-digit",
-          month: "long",
-          year: "numeric",
-        }) || "A definir",
+        new Date(getDateOnly(contractData.eventDate)).toLocaleDateString(
+          "pt-BR",
+          {
+            weekday: "long",
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          },
+        ) || "A definir",
       x: margin,
       y: yPosition,
       // fontSize: defaulFontSize,

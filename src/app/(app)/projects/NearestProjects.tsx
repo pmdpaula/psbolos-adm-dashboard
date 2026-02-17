@@ -4,6 +4,7 @@ import Link from "next/link";
 import GlassCard from "@/components/glass/GlassCard";
 import { PinnedNote } from "@/components/glass/PinnedNote";
 import type { ProjectDto } from "@/data/dto/project-dto";
+import { getDateOnly } from "@/lib/data-utils";
 
 type NearestProjectsProps = {
   projects: ProjectDto[];
@@ -25,12 +26,6 @@ export const NearestProjects = ({ projects }: NearestProjectsProps) => {
     const daysUntilSunday = dayOfWeek === 0 ? 7 : 7 - dayOfWeek;
     date.setDate(date.getDate() + daysUntilSunday);
     return date;
-  };
-
-  const getDateOnly = (dateString: string) => {
-    // Extrai apenas a data (YYYY-MM-DD) sem interpretar como UTC
-    const [year, month, day] = dateString.split("T")[0].split("-").map(Number);
-    return new Date(year, month - 1, day);
   };
 
   const now = new Date();

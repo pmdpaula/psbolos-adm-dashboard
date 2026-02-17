@@ -5,6 +5,7 @@ import Image from "next/image";
 
 import logoPSB from "@/assets/psb-banner_bglight.svg";
 import { companyData } from "@/data/companyData";
+import { getDateOnly } from "@/lib/data-utils";
 
 import type { ContractData } from "./page";
 
@@ -227,15 +228,14 @@ const PreviewContractFromProject = ({
           />
           <Field
             title="Data da entrega:"
-            value={new Date(contractData.eventDate).toLocaleDateString(
-              "pt-BR",
-              {
-                weekday: "long",
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-              },
-            )}
+            value={new Date(
+              getDateOnly(contractData.eventDate),
+            ).toLocaleDateString("pt-BR", {
+              weekday: "long",
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+            })}
           />
           {/* <Field title="Hora da entrega:" value={data.horaEntrega} /> */}
 
