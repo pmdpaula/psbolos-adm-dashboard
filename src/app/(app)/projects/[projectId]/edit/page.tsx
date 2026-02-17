@@ -1,23 +1,12 @@
 "use client";
 
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import PersonAddTwoToneIcon from "@mui/icons-material/PersonAddTwoTone";
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Box,
-  Button,
-  Stack,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import { Box } from "@mui/material";
 import { use, useEffect, useState } from "react";
 
+import { GradientPaper } from "@/components/GradientPaper";
 import type { ProjectDto } from "@/data/dto/project-dto";
 
+import { ProjectHeader } from "../../components/ProjectHeader";
 import { FormProject } from "../../FormProject";
 import { getProjectByIdAction } from "../actions";
 
@@ -30,8 +19,8 @@ interface EditProjectPageProps {
 
 const EditProjectPage = ({ params }: EditProjectPageProps) => {
   const { projectId } = use(params);
-  const theme = useTheme();
-  const isBreakpointSm = useMediaQuery(theme.breakpoints.down("sm"));
+  // const theme = useTheme();
+  // const isBreakpointSm = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [project, setProject] = useState<ProjectDto | null>(null);
 
@@ -47,82 +36,21 @@ const EditProjectPage = ({ params }: EditProjectPageProps) => {
   return (
     <>
       <Box mb={4}>
-        <Typography
-          variant="h4"
-          gutterBottom
-        >
-          Projeto: <strong>{project?.name}</strong>
-        </Typography>
-
-        <Typography
-          variant="body1"
-          gutterBottom
-        >
-          {project?.description}
-        </Typography>
-
-        <Typography
-          variant="body1"
-          gutterBottom
-        >
-          Este evento está com data marcada para{" "}
-          {project?.eventDate.split("T")[0]}
-        </Typography>
-
-        <Stack
-          direction={isBreakpointSm ? "column" : "row"}
-          spacing={3}
-          mt={2}
-        >
-          <Button
-            startIcon={<PersonAddTwoToneIcon />}
-            variant="outlined"
-            sx={{ mt: 2 }}
-            href={`/projects/${projectId}/connect`}
-          >
-            Conectar colaboradores
-          </Button>
-
-          <Button
-            startIcon={<PictureAsPdfIcon />}
-            // variant="outlined"
-            sx={{ mt: 2 }}
-            href={`/projects/${projectId}/contract`}
-          >
-            Gerar contrato
-          </Button>
-        </Stack>
+        <ProjectHeader
+          projectId={projectId}
+          name={project?.name || ""}
+          description={project?.description || ""}
+        />
       </Box>
 
-      <Accordion>
-        <AccordionSummary
-          expandIcon={<ArrowDropDownIcon />}
-          aria-controls="panel1-content"
-          id="panel1-header"
-          // sx={{ backgroundColor: "primary.dark", borderRadius: 1 }}
-          sx={{
-            background: theme.palette.gradient1.main,
-            borderRadius: 1,
-          }}
-        >
-          <Typography
-            component="span"
-            variant="body2"
-            color="textSecondary"
-          >
-            Abra o formulário aqui para editar os dados do projeto
-          </Typography>
-        </AccordionSummary>
-
-        <AccordionDetails sx={{ paddingTop: 2 }}>
-          {project && (
-            <FormProject
-              action="edit"
-              projectData={project}
-            />
-          )}
-        </AccordionDetails>
-      </Accordion>
+      {project && (
+        <GradientPaper>
+          <FormProject
+            action="edit"
+            projectData={project}
+          />
+        </GradientPaper>
+      )}
     </>
   );
 };
